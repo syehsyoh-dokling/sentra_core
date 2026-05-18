@@ -54,15 +54,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate deploy secrets
+      - name: Check deploy secrets
+        id: deploy-secrets
         shell: bash
         run: |
-          test -n "${{ secrets.APP1_SSH_HOST }}"
-          test -n "${{ secrets.APP1_SSH_USER }}"
-          test -n "${{ secrets.APP1_SSH_KEY }}"
-          test -n "${{ secrets.APP1_DEPLOY_PATH }}"
+          if [ -n "${{ secrets.APP1_SSH_HOST }}" ] && \
+             [ -n "${{ secrets.APP1_SSH_USER }}" ] && \
+             [ -n "${{ secrets.APP1_SSH_KEY }}" ] && \
+             [ -n "${{ secrets.APP1_DEPLOY_PATH }}" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Deploy skipped. Configure APP1_SSH_HOST, APP1_SSH_USER, APP1_SSH_KEY, and APP1_DEPLOY_PATH in GitHub Secrets to enable server deployment."
+          fi
 
       - name: Install SSH key
+        if: steps.deploy-secrets.outputs.ready == 'true'
         shell: bash
         run: |
           mkdir -p ~/.ssh
@@ -71,6 +78,7 @@ jobs:
           ssh-keyscan -H "${{ secrets.APP1_SSH_HOST }}" >> ~/.ssh/known_hosts
 
       - name: Sync files to server
+        if: steps.deploy-secrets.outputs.ready == 'true'
         shell: bash
         run: |
           rsync -az --delete \
@@ -81,6 +89,7 @@ jobs:
             ./ "${{ secrets.APP1_SSH_USER }}@${{ secrets.APP1_SSH_HOST }}:${{ secrets.APP1_DEPLOY_PATH }}/"
 
       - name: Write server env
+        if: steps.deploy-secrets.outputs.ready == 'true'
         shell: bash
         run: |
           ssh "${{ secrets.APP1_SSH_USER }}@${{ secrets.APP1_SSH_HOST }}" "cat > '${{ secrets.APP1_DEPLOY_PATH }}/.env' <<'EOF'
@@ -102,6 +111,7 @@ jobs:
           EOF"
 
       - name: Start APP1 on server
+        if: steps.deploy-secrets.outputs.ready == 'true'
         shell: bash
         run: |
           ssh "${{ secrets.APP1_SSH_USER }}@${{ secrets.APP1_SSH_HOST }}" \
