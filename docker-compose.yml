@@ -1,0 +1,84 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: sentracore_core_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-sentracore_core}
+    ports:
+      - "55432:5432"
+    volumes:
+      - sentracore_core_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-sentracore_core}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: sentracore_core_redis
+    ports:
+      - "56379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  core-api:
+    build:
+      context: .
+      dockerfile: crates/core-api/Dockerfile
+    container_name: sentracore_core_api
+    environment:
+      APP_NAME: ${APP_NAME:-sentracore-core-backend}
+      APP_PORT: ${APP_PORT:-4000}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/sentracore_core}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      JWT_SECRET: ${JWT_SECRET:-change-this-local-secret}
+      APP2_BASE_URL: ${APP2_BASE_URL:-http://host.docker.internal:8787}
+      MIDTRANS_BASE_URL: ${MIDTRANS_BASE_URL:-https://api.sandbox.midtrans.com}
+      SUMSUB_BASE_URL: ${SUMSUB_BASE_URL:-https://api.sumsub.com}
+      POLYGON_RPC_URL: ${POLYGON_RPC_URL:-https://polygon-amoy.g.alchemy.com/v2/YOUR_API_KEY}
+      RESEND_BASE_URL: ${RESEND_BASE_URL:-https://api.resend.com}
+      META_GRAPH_BASE_URL: ${META_GRAPH_BASE_URL:-https://graph.facebook.com}
+      MOCK_EXTERNAL_API: ${MOCK_EXTERNAL_API:-true}
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  core-worker:
+    build:
+      context: .
+      dockerfile: crates/core-worker/Dockerfile
+    container_name: sentracore_core_worker
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/sentracore_core}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      core-api:
+        condition: service_started
+
+
+  sentracore-web:
+    image: nginx:alpine
+    container_name: sentracore_web
+    ports:
+      - "4100:80"
+    volumes:
+      - ./frontend-dark:/usr/share/nginx/html:ro
+    depends_on:
+      - core-api
+volumes:
+  sentracore_core_pgdata:
+

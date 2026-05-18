@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asset Registry</title>
+    <link rel="stylesheet" href="assets/global.css" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+</head>
+<body>
+<script src="assets/app.js?v=logout-clean-20260518214626"></script>
+<script>
+appShell("asset", "Asset Registry", `
+  <div class="hero">
+    <span class="badge">Real World Asset Registry</span>
+    <h1 style="margin-top:14px">Pendaftaran dan Verifikasi Aset Nyata</h1>
+    <p>
+      Modul ini menjadi pintu masuk aset dunia nyata sebelum ditokenisasi. Aset tidak boleh langsung masuk marketplace
+      sebelum dokumen, legalitas, appraisal, verifikasi lapangan, dan risk scoring selesai.
+    </p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Draft</div><div class="stat-value">43</div><div class="stat-sub">Belum submitted</div></div>
+    <div class="stat-card"><div class="stat-label">Document Review</div><div class="stat-value" style="color:var(--gold)">28</div><div class="stat-sub">Legal & dokumen</div></div>
+    <div class="stat-card"><div class="stat-label">Approved</div><div class="stat-value" style="color:var(--accent)">71</div><div class="stat-sub">Siap tokenisasi</div></div>
+    <div class="stat-card"><div class="stat-label">Need Revision</div><div class="stat-value" style="color:var(--red)">12</div><div class="stat-sub">Dokumen kurang</div></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Asset Review Pipeline</div>
+      <div class="flow">
+        <div class="flow-step"><div class="step-no">1</div><div><div class="step-title">Draft</div><div class="step-desc">Pemilik aset mengisi data awal: jenis aset, lokasi, nilai estimasi, deskripsi, dan foto.</div></div></div>
+        <div class="flow-step"><div class="step-no">2</div><div><div class="step-title">Submitted</div><div class="step-desc">Aset dikirim ke provider untuk review. Semua dokumen diberi hash dan metadata.</div></div></div>
+        <div class="flow-step"><div class="step-no">3</div><div><div class="step-title">Document & Legal Review</div><div class="step-desc">Verifikator memeriksa sertifikat, perjanjian, status kepemilikan, dan potensi sengketa.</div></div></div>
+        <div class="flow-step"><div class="step-no">4</div><div><div class="step-title">Appraisal & Field Verification</div><div class="step-desc">Nilai aset dan kondisi fisik diverifikasi oleh pihak yang ditunjuk provider.</div></div></div>
+        <div class="flow-step"><div class="step-no">5</div><div><div class="step-title">Risk Scoring</div><div class="step-desc">Aset diberi rating risiko sebelum masuk tokenization engine.</div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Asset Queue</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Aset</th><th>Jenis</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Ruko Bandung Setiabudi</td><td>Properti</td><td><span class="badge gold">Appraisal</span></td></tr>
+            <tr><td>Gudang Surabaya Timur</td><td>Properti</td><td><span class="badge">Approved</span></td></tr>
+            <tr><td>Invoice Distributor Aceh</td><td>Invoice</td><td><span class="badge gold">Legal Review</span></td></tr>
+            <tr><td>Kebun Kopi Gayo</td><td>Komoditas</td><td><span class="badge red">Need Revision</span></td></tr>
+            <tr><td>UMKM Cold Storage</td><td>Proyek Usaha</td><td><span class="badge">Approved</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+`);
+</script>
+</body>
+</html>

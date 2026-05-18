@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tokenization Engine</title>
+    <link rel="stylesheet" href="assets/global.css" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+</head>
+<body>
+<script src="assets/app.js?v=logout-clean-20260518214626"></script>
+<script>
+appShell("tokenization", "Tokenization Engine", `
+  <div class="hero">
+    <span class="badge">Asset Ã¢â€ â€™ Token Supply</span>
+    <h1 style="margin-top:14px">Mesin Pemecah Aset Menjadi Token Digital</h1>
+    <p>
+      Modul ini mengubah aset yang sudah approved menjadi skema token: nilai aset, porsi tokenisasi, total supply,
+      harga per token, hak ekonomi, batasan transfer, dan mapping ke smart contract.
+    </p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Nilai Aset</div><div class="stat-value">Rp 2M</div><div class="stat-sub">Contoh ruko produktif</div></div>
+    <div class="stat-card"><div class="stat-label">Porsi Tokenisasi</div><div class="stat-value">30%</div><div class="stat-sub">Rp 600 juta</div></div>
+    <div class="stat-card"><div class="stat-label">Harga Token</div><div class="stat-value">Rp 10K</div><div class="stat-sub">Per token</div></div>
+    <div class="stat-card"><div class="stat-label">Total Supply</div><div class="stat-value">60K</div><div class="stat-sub">Token aset</div></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Tokenization Setup</div>
+      <div class="flow">
+        <div class="flow-step"><div class="step-no">1</div><div><div class="step-title">Ambil aset approved</div><div class="step-desc">Hanya aset dengan status approved yang bisa masuk tokenization engine.</div></div></div>
+        <div class="flow-step"><div class="step-no">2</div><div><div class="step-title">Tentukan porsi tokenisasi</div><div class="step-desc">Provider menentukan berapa persen nilai ekonomi aset yang ditokenisasi.</div></div></div>
+        <div class="flow-step"><div class="step-no">3</div><div><div class="step-title">Hitung supply dan harga token</div><div class="step-desc">Supply dihitung dari nilai tokenisasi dibagi harga per token.</div></div></div>
+        <div class="flow-step"><div class="step-no">4</div><div><div class="step-title">Aturan holder</div><div class="step-desc">Menentukan hak ekonomi, periode distribusi, batas transfer, KYC restriction, dan buyback.</div></div></div>
+        <div class="flow-step"><div class="step-no">5</div><div><div class="step-title">Prepare smart contract</div><div class="step-desc">Sistem menyiapkan data untuk Token Contract dan Asset Registry Contract.</div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Tokenization Batch</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Aset</th><th>Supply</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Ruko Bandung</td><td>60.000</td><td><span class="badge gold">Draft Setup</span></td></tr>
+            <tr><td>Gudang Surabaya</td><td>120.000</td><td><span class="badge">Ready Deploy</span></td></tr>
+            <tr><td>Cold Storage UMKM</td><td>85.000</td><td><span class="badge">Minted</span></td></tr>
+            <tr><td>Invoice Aceh</td><td>45.000</td><td><span class="badge gold">Pricing Review</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+`);
+</script>
+</body>
+</html>

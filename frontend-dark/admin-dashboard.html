@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentraCore Ã¢â‚¬â€ Admin Operations Center</title>
+  <link rel="stylesheet" href="assets/global.css" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="logo">
+      <img class="logo-icon" src="assets/logo-blockchain.png" alt="SentraCore Logo" />
+      SentraCore
+    </div>
+
+    <div class="nav-section">Admin</div>
+    <a class="nav-item active" href="admin-dashboard.html">Ã¢â€“Â£ Operations Center</a>
+    <a class="nav-item" href="dashboard.html">Ã¢Â¬Â¡ User Dashboard</a>
+    <a class="nav-item" href="smart-contract.html">Ã¢Â¬Â¢ Smart Contract</a>
+    <a class="nav-item" href="indexer.html">Ã¢Â¬â„¢ Indexer</a>
+    <a class="nav-item" href="escrow.html">Ã¢Å¸Â³ Escrow</a>
+
+    <div class="nav-section">APP1 Gateway</div>
+    <a class="nav-item" href="http://127.0.0.1:4000/health" target="_blank">Ã¢â€”Â API Health</a>
+    <a class="nav-item" href="http://127.0.0.1:4000/api/v1/external/providers" target="_blank">Ã¢â€”â€  External Providers</a>
+    <a class="nav-item" href="http://127.0.0.1:4000/api/v1/admin/system-health" target="_blank">Ã¢â€”â€° System Health</a>
+
+    <div class="nav-section">Session</div>
+    <a class="nav-item" href="#" onclick="logoutAdmin()">Ã¢ÂÂ» Logout</a>
+      <a class="nav-item logout" href="#" onclick="sentraFullLogout(); return false;">â» Logout</a>
+</aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <div class="page-title">Admin Operations Center</div>
+        <div class="topbar-meta" style="margin-top:4px">
+          <span><span class="live-dot"></span> APP1 Gateway Live</span>
+          <span>Rust Axum Ã‚Â· PostgreSQL Ã‚Â· Redis Ã‚Â· Nginx</span>
+        </div>
+      </div>
+      <div class="topbar-meta">
+        <span id="adminEmail">admin@sentracore.local</span>
+        <span class="badge">Admin</span>
+      </div>
+    </header>
+
+    <section class="content">
+      <div class="hero">
+        <span class="badge">Smart Engine for Nusantara e-Contract Ecosystem</span>
+        <h1>Smart Contract Admin Dashboard</h1>
+        <p>
+          Dashboard ini digunakan admin untuk memantau APP1: onboarding, request audit,
+          payment mock, validasi intake, audit job gateway, external provider testing,
+          dan kesiapan transfer pekerjaan ke APP2 processing engine.
+        </p>
+        <div class="admin-quick-actions" style="margin-top:18px">
+          <button class="admin-action" onclick="loadSystemHealth()">Refresh System Health</button>
+          <button class="admin-action" onclick="loadProviders()">Check External Providers</button>
+          <button class="admin-action" onclick="createDummyAudit()">Create Dummy Audit</button>
+          <button class="admin-action" onclick="openLink('http://127.0.0.1:4000/health')">Open API Health</button>
+        </div>
+      </div>
+
+      <div class="admin-metric-row">
+        <div class="stat-card">
+          <div class="stat-label">APP1 API</div>
+          <div class="stat-value" id="apiStatus">Checking</div>
+          <div class="stat-sub">Core gateway status</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Database</div>
+          <div class="stat-value" id="dbStatus">Checking</div>
+          <div class="stat-sub">PostgreSQL connection</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Redis Queue</div>
+          <div class="stat-value" id="redisStatus">Checking</div>
+          <div class="stat-sub">Async worker readiness</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Audit Intake</div>
+          <div class="stat-value" id="auditCount">0</div>
+          <div class="stat-sub">APP1 request records</div>
+        </div>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title">Audit Intake & Job Activity</div>
+          <p class="card-desc">
+            Grafik simulasi ini mengikuti layout ChainVault, tetapi indikatornya diganti menjadi aktivitas smart contract:
+            audit request, validation, payment, job creation, dan transfer readiness.
+          </p>
+          <div class="admin-chart">
+            <svg viewBox="0 0 800 260" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="goldFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#ffd86a" stop-opacity="0.34"/>
+                  <stop offset="100%" stop-color="#ffd86a" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,210 C90,190 130,165 220,170 C310,175 350,130 450,126 C550,122 600,85 700,80 C750,78 780,55 800,45 L800,260 L0,260 Z" fill="url(#goldFill)"></path>
+              <path d="M0,210 C90,190 130,165 220,170 C310,175 350,130 450,126 C550,122 600,85 700,80 C750,78 780,55 800,45" fill="none" stroke="#ffd86a" stroke-width="4"></path>
+              <circle cx="700" cy="80" r="7" fill="#ffd86a"></circle>
+              <circle cx="800" cy="45" r="9" fill="#f2b735"></circle>
+            </svg>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">APP1 External Providers</div>
+          <div class="admin-pill-list" id="providerList">
+            <div class="admin-pill"><strong>Loading</strong><span>Fetching providers...</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title">Recent Admin Events</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Layer</th>
+                  <th>Status</th>
+                  <th>Note</th>
+                </tr>
+              </thead>
+              <tbody id="eventRows">
+                <tr>
+                  <td>Admin dashboard loaded</td>
+                  <td>Frontend</td>
+                  <td><span class="badge green">OK</span></td>
+                  <td class="hash">localhost:4100</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Admin Scope</div>
+          <div class="admin-pill-list">
+            <div class="admin-pill"><strong>User & Role</strong><span>Admin, developer, viewer</span></div>
+            <div class="admin-pill"><strong>Audit Intake</strong><span>Request, payment, validation</span></div>
+            <div class="admin-pill"><strong>Job Gateway</strong><span>Prepare transfer to APP2</span></div>
+            <div class="admin-pill"><strong>External API</strong><span>Provider test runner</span></div>
+            <div class="admin-pill"><strong>System Health</strong><span>API, DB, Redis, Worker</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const API_BASE = "http://127.0.0.1:4000";
+
+function getToken() {
+  return localStorage.getItem("sentra_token") || sessionStorage.getItem("sentra_token");
+}
+
+function addEvent(event, layer, status, note) {
+  const rows = document.getElementById("eventRows");
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td>${event}</td>
+    <td>${layer}</td>
+    <td><span class="badge ${status === "OK" ? "green" : "red"}">${status}</span></td>
+    <td class="hash">${note || "-"}</td>
+  `;
+  rows.prepend(tr);
+}
+
+function openLink(url) {
+  window.open(url, "_blank");
+}
+
+async function loadSystemHealth() {
+  try {
+    const res = await fetch(API_BASE + "/api/v1/admin/system-health");
+    const json = await res.json();
+
+    if (!json.success) throw new Error(json.message || "System health failed");
+
+    document.getElementById("apiStatus").textContent = json.data.api ? "Live" : "Down";
+    document.getElementById("dbStatus").textContent = json.data.db ? "OK" : "Down";
+    document.getElementById("redisStatus").textContent = json.data.redis ? "OK" : "Down";
+    document.getElementById("auditCount").textContent = json.data.audits ?? "0";
+
+    addEvent("System health refreshed", "APP1", "OK", "api/db/redis");
+  } catch (err) {
+    addEvent("System health failed", "APP1", "ERR", err.message);
+  }
+}
+
+async function loadProviders() {
+  const list = document.getElementById("providerList");
+  list.innerHTML = `<div class="admin-pill"><strong>Loading</strong><span>Fetching providers...</span></div>`;
+
+  try {
+    const res = await fetch(API_BASE + "/api/v1/external/providers");
+    const json = await res.json();
+
+    if (!json.success) throw new Error(json.message || "Provider endpoint failed");
+
+    const providers = json.data.external_testing_apis || json.data.external_services || {};
+    const html = Object.keys(providers).map((key) => {
+      const p = providers[key];
+      const label = p.provider || key;
+      const url = p.url || p;
+      return `<div class="admin-pill"><strong>${label}</strong><span>${url}</span></div>`;
+    }).join("");
+
+    list.innerHTML = html || `<div class="admin-pill"><strong>No provider</strong><span>Empty response</span></div>`;
+    addEvent("External providers loaded", "APP1", "OK", "provider map");
+  } catch (err) {
+    list.innerHTML = `<div class="admin-pill"><strong>Error</strong><span>${err.message}</span></div>`;
+    addEvent("External providers failed", "APP1", "ERR", err.message);
+  }
+}
+
+async function createDummyAudit() {
+  try {
+    const res = await fetch(API_BASE + "/api/v1/audits", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        blockchain: "POLYGON",
+        priority: "HIGH",
+        audit_type: "FULL",
+        notes: "Admin dashboard dummy audit request",
+        contract_ids: []
+      })
+    });
+
+    const json = await res.json();
+
+    if (!json.success) throw new Error(json.message || "Create audit failed");
+
+    addEvent("Dummy audit created", "APP1", "OK", json.data.id);
+    await loadSystemHealth();
+  } catch (err) {
+    addEvent("Dummy audit failed", "APP1", "ERR", err.message);
+  }
+}
+
+async function logoutAdmin() {
+  try {
+    localStorage.removeItem("sentra_token");
+    localStorage.removeItem("sentra_user");
+    localStorage.removeItem("sentra_login_email");
+    localStorage.removeItem("sentra_login_role");
+
+    sessionStorage.removeItem("sentra_token");
+    sessionStorage.removeItem("sentra_user");
+    sessionStorage.clear();
+
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("sentra_") || key.startsWith("sentracore_")) {
+        localStorage.removeItem(key);
+      }
+    });
+
+    if ("caches" in window) {
+      const names = await caches.keys();
+      await Promise.all(names.map((name) => caches.delete(name)));
+    }
+
+    if ("indexedDB" in window && indexedDB.databases) {
+      const dbs = await indexedDB.databases();
+      await Promise.all(
+        dbs
+          .filter((db) => db.name && (db.name.includes("sentra") || db.name.includes("sentracore")))
+          .map((db) => new Promise((resolve) => {
+            const req = indexedDB.deleteDatabase(db.name);
+            req.onsuccess = req.onerror = req.onblocked = () => resolve();
+          }))
+      );
+    }
+
+    document.cookie.split(";").forEach((cookie) => {
+      const eqPos = cookie.indexOf("=");
+      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+      if (name) {
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+      }
+    });
+  } catch (err) {
+    console.warn("Logout cache cleanup warning:", err);
+  }
+
+  window.location.replace("index.html?logout=" + Date.now());
+}
+
+(function boot() {
+  const userRaw = localStorage.getItem("sentra_user") || sessionStorage.getItem("sentra_user");
+
+  if (userRaw) {
+    try {
+      const user = JSON.parse(userRaw);
+      document.getElementById("adminEmail").textContent = user.email || "admin@sentracore.local";
+    } catch (_) {}
+  }
+
+  loadSystemHealth();
+  loadProviders();
+})();
+
+async function sentraFullLogout() {
+  try {
+    localStorage.removeItem("sentra_token");
+    localStorage.removeItem("sentra_user");
+    localStorage.removeItem("sentra_login_email");
+    localStorage.removeItem("sentra_login_role");
+
+    sessionStorage.removeItem("sentra_token");
+    sessionStorage.removeItem("sentra_user");
+    sessionStorage.clear();
+
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("sentra_") || key.startsWith("sentracore_")) {
+        localStorage.removeItem(key);
+      }
+    });
+
+    if ("caches" in window) {
+      const names = await caches.keys();
+      await Promise.all(names.map((name) => caches.delete(name)));
+    }
+
+    document.cookie.split(";").forEach((cookie) => {
+      const eqPos = cookie.indexOf("=");
+      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+      if (name) {
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+      }
+    });
+  } catch (err) {
+    console.warn("Logout cleanup warning:", err);
+  }
+
+  window.location.replace("index.html?logout=" + Date.now());
+}
+</script>
+</body>
+</html>

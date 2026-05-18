@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blockchain Indexer</title>
+    <link rel="stylesheet" href="assets/global.css" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+</head>
+<body>
+<script src="assets/app.js?v=logout-clean-20260518214626"></script>
+<script>
+appShell("indexer", "Blockchain Indexer", `
+  <div class="hero">
+    <span class="badge">Event Listener Ã‚Â· Sync Worker Ã‚Â· Fast Dashboard</span>
+    <h1 style="margin-top:14px">Blockchain Indexer Module</h1>
+    <p>
+      Dashboard tidak boleh membaca blockchain langsung setiap halaman dibuka. Indexer membaca event dari blockchain,
+      menyimpannya ke database, lalu dashboard membaca data lokal yang sudah disinkronkan.
+    </p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Last Block</div><div class="stat-value">19,472,810</div><div class="stat-sub">Sepolia simulation</div></div>
+    <div class="stat-card"><div class="stat-label">Events Indexed</div><div class="stat-value">248K</div><div class="stat-sub">Asset/token/escrow events</div></div>
+    <div class="stat-card"><div class="stat-label">Sync Lag</div><div class="stat-value" style="color:var(--accent)">2s</div><div class="stat-sub">Healthy</div></div>
+    <div class="stat-card"><div class="stat-label">Failed Jobs</div><div class="stat-value" style="color:var(--red)">3</div><div class="stat-sub">Retry queue</div></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Indexer Flow</div>
+      <div class="flow">
+        <div class="flow-step"><div class="step-no">1</div><div><div class="step-title">Listen blockchain event</div><div class="step-desc">Indexer mendengar event dari AssetRegistry, TokenContract, Marketplace, Escrow, dan RevenueDistribution.</div></div></div>
+        <div class="flow-step"><div class="step-no">2</div><div><div class="step-title">Normalize event</div><div class="step-desc">Event mentah diubah menjadi format database yang konsisten.</div></div></div>
+        <div class="flow-step"><div class="step-no">3</div><div><div class="step-title">Store to database</div><div class="step-desc">Data disimpan di tabel blockchain_events, token_ledger, wallet_ledger, dan portfolio_summary.</div></div></div>
+        <div class="flow-step"><div class="step-no">4</div><div><div class="step-title">Dashboard reads local DB</div><div class="step-desc">Dashboard menjadi cepat karena tidak menunggu RPC blockchain setiap request.</div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Live Event Feed</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Event</th><th>Contract</th><th>Block</th></tr></thead>
+          <tbody>
+            <tr><td>TokenMinted</td><td><span class="hash">0x7f3a...21bc</span></td><td>19,472,810</td></tr>
+            <tr><td>EscrowLocked</td><td><span class="hash">0x91aa...88c1</span></td><td>19,472,808</td></tr>
+            <tr><td>RevenueBatchCreated</td><td><span class="hash">0x12bc...44de</span></td><td>19,472,802</td></tr>
+            <tr><td>AssetApproved</td><td><span class="hash">0xaef9...77a0</span></td><td>19,472,790</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+`);
+</script>
+</body>
+</html>

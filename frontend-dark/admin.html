@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Provider Admin</title>
+    <link rel="stylesheet" href="assets/global.css" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+</head>
+<body>
+<script src="assets/app.js?v=logout-clean-20260518214626"></script>
+<script>
+appShell("admin", "Provider Admin Dashboard", `
+  <div class="hero">
+    <span class="badge">Operations Ã‚Â· Compliance Ã‚Â· Control Center</span>
+    <h1 style="margin-top:14px">Admin & Provider Dashboard</h1>
+    <p>
+      Dashboard ini digunakan provider untuk mengendalikan platform: user, KYC, asset review, legal, appraisal,
+      smart contract deployment, marketplace, transaksi, dispute, compliance, audit log, dan system health.
+    </p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">KYC Queue</div><div class="stat-value" style="color:var(--gold)">184</div><div class="stat-sub">Butuh review</div></div>
+    <div class="stat-card"><div class="stat-label">Asset Review</div><div class="stat-value">68</div><div class="stat-sub">Legal/appraisal/field</div></div>
+    <div class="stat-card"><div class="stat-label">Dispute Center</div><div class="stat-value" style="color:var(--red)">9</div><div class="stat-sub">Prioritas tinggi</div></div>
+    <div class="stat-card"><div class="stat-label">System Health</div><div class="stat-value" style="color:var(--accent)">98.9%</div><div class="stat-sub">API, DB, Redis, Worker</div></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Operations Control</div>
+      <div class="flow">
+        <div class="flow-step"><div class="step-no">1</div><div><div class="step-title">User & KYC Management</div><div class="step-desc">Review user, dokumen identitas, profil risiko, limit transaksi, dan wallet verification.</div></div></div>
+        <div class="flow-step"><div class="step-no">2</div><div><div class="step-title">Asset Review Board</div><div class="step-desc">Legal review, appraisal, field verification, risk scoring, approval/rejection aset.</div></div></div>
+        <div class="flow-step"><div class="step-no">3</div><div><div class="step-title">Smart Contract Deployment</div><div class="step-desc">Provider mengatur deployment testnet/mainnet, pause mechanism, dan contract registry.</div></div></div>
+        <div class="flow-step"><div class="step-no">4</div><div><div class="step-title">Transaction Monitoring</div><div class="step-desc">Melihat order, escrow, failed transaction, suspicious activity, dan reconciliation.</div></div></div>
+        <div class="flow-step"><div class="step-no">5</div><div><div class="step-title">Compliance Report</div><div class="step-desc">Menyediakan audit log dan laporan untuk internal, auditor, atau regulator viewer.</div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">System Health</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Service</th><th>Status</th><th>Metric</th></tr></thead>
+          <tbody>
+            <tr><td>Rust Axum API</td><td><span class="badge">Healthy</span></td><td>42ms avg</td></tr>
+            <tr><td>PostgreSQL</td><td><span class="badge">Healthy</span></td><td>12 active conn</td></tr>
+            <tr><td>Redis Queue</td><td><span class="badge">Healthy</span></td><td>3 pending jobs</td></tr>
+            <tr><td>Blockchain Indexer</td><td><span class="badge gold">Lag Warning</span></td><td>2 blocks behind</td></tr>
+            <tr><td>Object Storage</td><td><span class="badge">Healthy</span></td><td>82GB used</td></tr>
+            <tr><td>Notification</td><td><span class="badge red">Retry</span></td><td>17 failed WA</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+`);
+</script>
+</body>
+</html>

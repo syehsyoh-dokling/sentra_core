@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Revenue Distribution</title>
+    <link rel="stylesheet" href="assets/global.css" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+</head>
+<body>
+<script src="assets/app.js?v=logout-clean-20260518214626"></script>
+<script>
+appShell("revenue", "Revenue Distribution", `
+  <div class="hero">
+    <span class="badge">Claim Based Ã‚Â· Batch Ã‚Â· Merkle Ready</span>
+    <h1 style="margin-top:14px">Revenue Distribution Module</h1>
+    <p>
+      Modul ini menghitung hak ekonomi investor berdasarkan jumlah token yang dimiliki. Backend menghitung batch,
+      smart contract mencatat distribusi, lalu user melakukan klaim sesuai haknya.
+    </p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Monthly Revenue</div><div class="stat-value">Rp 20Jt</div><div class="stat-sub">Contoh hasil sewa</div></div>
+    <div class="stat-card"><div class="stat-label">Total Token</div><div class="stat-value">200K</div><div class="stat-sub">Token beredar</div></div>
+    <div class="stat-card"><div class="stat-label">Your Token</div><div class="stat-value">1K</div><div class="stat-sub">0.5% ownership economics</div></div>
+    <div class="stat-card"><div class="stat-label">Your Claim</div><div class="stat-value" style="color:var(--accent)">Rp 100K</div><div class="stat-sub">Siap klaim</div></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Distribution Flow</div>
+      <div class="flow">
+        <div class="flow-step"><div class="step-no">1</div><div><div class="step-title">Revenue recorded</div><div class="step-desc">Provider memasukkan hasil ekonomi aset, misalnya sewa bulanan atau pendapatan proyek.</div></div></div>
+        <div class="flow-step"><div class="step-no">2</div><div><div class="step-title">Backend calculation</div><div class="step-desc">Backend menghitung hak investor berdasarkan token snapshot.</div></div></div>
+        <div class="flow-step"><div class="step-no">3</div><div><div class="step-title">Distribution batch</div><div class="step-desc">Batch distribusi dibuat, dicek provider, lalu dikunci untuk claim.</div></div></div>
+        <div class="flow-step"><div class="step-no">4</div><div><div class="step-title">Smart contract proof</div><div class="step-desc">Smart contract mencatat batch distribusi, root hash, atau status claim.</div></div></div>
+        <div class="flow-step"><div class="step-no">5</div><div><div class="step-title">Investor claim</div><div class="step-desc">Investor mengklaim haknya tanpa provider harus transfer satu per satu.</div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Claim Records</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Investor</th><th>Token</th><th>Claim</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>0x3f...d7c2</td><td>1.000</td><td>Rp 100.000</td><td><span class="badge">Ready</span></td></tr>
+            <tr><td>0x91...a8ef</td><td>5.000</td><td>Rp 500.000</td><td><span class="badge">Claimed</span></td></tr>
+            <tr><td>0x22...77bc</td><td>2.400</td><td>Rp 240.000</td><td><span class="badge gold">Pending</span></td></tr>
+            <tr><td>0xbb...13de</td><td>800</td><td>Rp 80.000</td><td><span class="badge">Ready</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+`);
+</script>
+</body>
+</html>

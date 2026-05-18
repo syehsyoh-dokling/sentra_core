@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Onboarding</title>
+    <link rel="stylesheet" href="assets/global.css" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+</head>
+<body>
+<script src="assets/app.js?v=logout-clean-20260518214626"></script>
+<script>
+appShell("onboarding", "User Onboarding", `
+  <div class="hero">
+    <span class="badge">Identity Ã‚Â· KYC Ã‚Â· Wallet</span>
+    <h1 style="margin-top:14px">User Onboarding Module</h1>
+    <p>
+      Modul ini mengatur pendaftaran investor, pemilik aset, provider, verifikator, dan compliance viewer.
+      Fokusnya bukan hanya login, tetapi juga validasi identitas, profil risiko, wallet, dan batas transaksi.
+    </p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Registered Users</div><div class="stat-value">8.420</div><div class="stat-sub">Semua role</div></div>
+    <div class="stat-card"><div class="stat-label">KYC Verified</div><div class="stat-value" style="color:var(--accent)">6.910</div><div class="stat-sub">82.0% verified</div></div>
+    <div class="stat-card"><div class="stat-label">Pending Review</div><div class="stat-value" style="color:var(--gold)">184</div><div class="stat-sub">Menunggu verifikator</div></div>
+    <div class="stat-card"><div class="stat-label">Rejected</div><div class="stat-value" style="color:var(--red)">37</div><div class="stat-sub">Dokumen tidak valid</div></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Onboarding Flow</div>
+      <div class="flow">
+        <div class="flow-step"><div class="step-no">1</div><div><div class="step-title">Register akun</div><div class="step-desc">User memasukkan nama, email, nomor HP, password, dan memilih role awal.</div></div></div>
+        <div class="flow-step"><div class="step-no">2</div><div><div class="step-title">OTP email/WhatsApp</div><div class="step-desc">Sistem mengirim kode OTP untuk memastikan kontak aktif dan dapat dipakai notifikasi transaksi.</div></div></div>
+        <div class="flow-step"><div class="step-no">3</div><div><div class="step-title">Upload KTP/selfie</div><div class="step-desc">Data sensitif disimpan off-chain, bukan di blockchain. Blockchain cukup menyimpan hash bukti jika diperlukan.</div></div></div>
+        <div class="flow-step"><div class="step-no">4</div><div><div class="step-title">KYC review</div><div class="step-desc">Verifikator memeriksa dokumen, kecocokan data, profil risiko, dan limit transaksi.</div></div></div>
+        <div class="flow-step"><div class="step-no">5</div><div><div class="step-title">Wallet aktif</div><div class="step-desc">Wallet address diverifikasi. Private key tidak pernah disimpan di backend.</div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Status KYC</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>User</th><th>Role</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Arif Wibowo</td><td>Investor</td><td><span class="badge">Verified</span></td></tr>
+            <tr><td>PT Ruko Bandung</td><td>Pemilik Aset</td><td><span class="badge gold">Review</span></td></tr>
+            <tr><td>Nadia Legal</td><td>Verifikator</td><td><span class="badge">Active</span></td></tr>
+            <tr><td>Compliance Ops</td><td>Regulator Viewer</td><td><span class="badge">Read Only</span></td></tr>
+            <tr><td>Wallet 0x7f3a...</td><td>Investor</td><td><span class="badge red">Need Revision</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+`);
+</script>
+</body>
+</html>

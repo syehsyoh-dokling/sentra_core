@@ -1,0 +1,20 @@
+# Logs and build output
+*.log
+target/
+
+# Runtime data
+storage/
+
+# Secrets and local env
+.env
+.env.*
+!*example*
+*key*.docx
+Gemini key.docx
+
+# Editor/system
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.sw?

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transaction & Escrow</title>
+    <link rel="stylesheet" href="assets/global.css" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+</head>
+<body>
+<script src="assets/app.js?v=logout-clean-20260518214626"></script>
+<script>
+appShell("escrow", "Transaction & Escrow", `
+  <div class="hero">
+    <span class="badge">Order Ã‚Â· Escrow Ã‚Â· Settlement</span>
+    <h1 style="margin-top:14px">Transaction & Escrow Module</h1>
+    <p>
+      Modul ini memastikan dana, token, dan settlement tidak berjalan liar. Order dibuat, pembayaran masuk,
+      dana dikunci escrow, blockchain transaction dikonfirmasi, lalu settlement diselesaikan.
+    </p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Open Orders</div><div class="stat-value">218</div><div class="stat-sub">Buy/sell aktif</div></div>
+    <div class="stat-card"><div class="stat-label">Escrow Locked</div><div class="stat-value">Rp 920Jt</div><div class="stat-sub">Menunggu settlement</div></div>
+    <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value" style="color:var(--accent)">1.842</div><div class="stat-sub">Settlement sukses</div></div>
+    <div class="stat-card"><div class="stat-label">Disputed</div><div class="stat-value" style="color:var(--red)">9</div><div class="stat-sub">Butuh review provider</div></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Transaction Status Flow</div>
+      <div class="flow">
+        <div class="flow-step"><div class="step-no">1</div><div><div class="step-title">Created</div><div class="step-desc">Investor membuat order pembelian atau penjualan token aset.</div></div></div>
+        <div class="flow-step"><div class="step-no">2</div><div><div class="step-title">Payment Pending / Received</div><div class="step-desc">Sistem menunggu pembayaran atau konfirmasi payment gateway.</div></div></div>
+        <div class="flow-step"><div class="step-no">3</div><div><div class="step-title">Escrow Locked</div><div class="step-desc">Dana dikunci agar token tidak berpindah sebelum syarat transaksi terpenuhi.</div></div></div>
+        <div class="flow-step"><div class="step-no">4</div><div><div class="step-title">Blockchain Pending / Confirmed</div><div class="step-desc">Smart contract mencatat transfer token dan event di blockchain.</div></div></div>
+        <div class="flow-step"><div class="step-no">5</div><div><div class="step-title">Settlement Completed</div><div class="step-desc">Dana dan token diselesaikan, ledger internal dan blockchain event disinkronkan.</div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Recent Escrow Records</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Order</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>#ORD-4102</td><td>Rp 12.500.000</td><td><span class="badge">Blockchain Confirmed</span></td></tr>
+            <tr><td>#ORD-4103</td><td>Rp 7.800.000</td><td><span class="badge gold">Escrow Locked</span></td></tr>
+            <tr><td>#ORD-4104</td><td>Rp 3.200.000</td><td><span class="badge gold">Payment Pending</span></td></tr>
+            <tr><td>#ORD-4105</td><td>Rp 9.100.000</td><td><span class="badge red">Disputed</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+`);
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Contract Layer</title>
+    <link rel="stylesheet" href="assets/global.css" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+</head>
+<body>
+<script src="assets/app.js?v=logout-clean-20260518214626"></script>
+<script>
+appShell("smartcontract", "Smart Contract Layer", `
+  <div class="hero">
+    <span class="badge">On-chain Rules Ã‚Â· Off-chain Compliance</span>
+    <h1 style="margin-top:14px">Smart Contract Module</h1>
+    <p>
+      Modul ini menghubungkan backend dengan blockchain. Smart contract tidak menyimpan semua data, tetapi menyimpan
+      bukti penting seperti token ownership, hash dokumen, status aset, transaksi, escrow, dan distribusi hasil.
+    </p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Contracts</div><div class="stat-value">8</div><div class="stat-sub">Core contract modules</div></div>
+    <div class="stat-card"><div class="stat-label">Deployed</div><div class="stat-value" style="color:var(--accent)">5</div><div class="stat-sub">Testnet active</div></div>
+    <div class="stat-card"><div class="stat-label">Pending Audit</div><div class="stat-value" style="color:var(--gold)">3</div><div class="stat-sub">Before production</div></div>
+    <div class="stat-card"><div class="stat-label">Paused</div><div class="stat-value">0</div><div class="stat-sub">Emergency control</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Required Smart Contracts</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Contract</th><th>Function</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Identity Registry</td><td>Mengecek KYC/wallet yang boleh transaksi</td><td><span class="badge">Ready</span></td></tr>
+          <tr><td>Asset Registry</td><td>Mencatat aset yang sudah disetujui</td><td><span class="badge">Ready</span></td></tr>
+          <tr><td>Token Contract</td><td>Menerbitkan token aset</td><td><span class="badge gold">Testing</span></td></tr>
+          <tr><td>Marketplace Contract</td><td>Mengatur jual beli token</td><td><span class="badge gold">Testing</span></td></tr>
+          <tr><td>Escrow Contract</td><td>Mengunci transaksi sampai syarat terpenuhi</td><td><span class="badge gold">Testing</span></td></tr>
+          <tr><td>Revenue Distribution</td><td>Mengatur pembagian hasil</td><td><span class="badge">Draft</span></td></tr>
+          <tr><td>Governance/Voting</td><td>Voting keputusan penting aset</td><td><span class="badge">Draft</span></td></tr>
+          <tr><td>Compliance/Pause</td><td>Membekukan transaksi jika ada masalah</td><td><span class="badge">Ready</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">On-chain Data</div>
+      <p class="card-desc">Cocok disimpan: ID/hash aset, total token, kepemilikan token, transaksi token, status contract, batch distribusi, dan transaction hash.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Off-chain Data</div>
+      <p class="card-desc">Jangan simpan KTP, selfie, nomor HP, rekening, sertifikat asli, foto/video aset, dan dokumen legal lengkap ke blockchain.</p>
+    </div>
+  </div>
+`);
+</script>
+</body>
+</html>

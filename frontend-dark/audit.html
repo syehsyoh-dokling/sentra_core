@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audit Intake</title>
+  <link rel="stylesheet" href="assets/global.css" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+</head>
+<body>
+<script src="assets/app.js?v=audit-intake-20260518"></script>
+<script>
+const API_BASE = "http://127.0.0.1:4000";
+let currentAuditId = "";
+
+appShell("audit", "Audit Intake", `
+  <div class="hero">
+    <span class="badge">APP1 Gateway</span>
+    <h1 style="margin-top:14px">Audit Intake</h1>
+    <p>
+      Halaman ini adalah pintu masuk APP1 untuk membuat audit request, validasi intake,
+      membuat audit job, lalu menyiapkan transfer ke APP2 processing engine.
+    </p>
+    <div class="actions">
+      <button class="btn gold" onclick="createAudit()">Create Audit Request</button>
+      <button class="btn" onclick="validateLatestAudit()">Validate Intake</button>
+      <button class="btn secondary" onclick="createAuditJob()">Create Audit Job</button>
+      <button class="btn secondary" onclick="loadAuditData()">Refresh</button>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Audits</div><div class="stat-value" id="auditTotal">0</div><div class="stat-sub">from APP1 database</div></div>
+    <div class="stat-card"><div class="stat-label">Audit Jobs</div><div class="stat-value" id="jobTotal">0</div><div class="stat-sub">gateway jobs</div></div>
+    <div class="stat-card"><div class="stat-label">Queued</div><div class="stat-value" id="queuedTotal">0</div><div class="stat-sub">ready for APP2</div></div>
+    <div class="stat-card"><div class="stat-label">Payments</div><div class="stat-value" id="paymentTotal">0</div><div class="stat-sub">payment mock/history</div></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Create Audit Request</div>
+      <div class="triple-grid" style="grid-template-columns:1fr 1fr 1fr">
+        <label class="card-desc">Blockchain<br><input class="input" id="blockchain" value="POLYGON" /></label>
+        <label class="card-desc">Priority<br><input class="input" id="priority" value="HIGH" /></label>
+        <label class="card-desc">Audit Type<br><input class="input" id="auditType" value="FULL" /></label>
+      </div>
+      <label class="card-desc">Notes<br><input class="input" id="notes" value="Please focus on staking logic" /></label>
+      <div class="actions">
+        <button class="btn gold" onclick="createAudit()">Submit Intake</button>
+        <button class="btn secondary" onclick="createPayment()">Create Payment Mock</button>
+      </div>
+      <p class="card-desc" id="formStatus" style="margin-top:12px">Ready.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">APP1 -> APP2 Readiness</div>
+      <div class="flow">
+        <div class="flow-step"><div class="step-no">1</div><div><div class="step-title">Audit Request</div><div class="step-desc" id="stepAudit">Waiting for data</div></div></div>
+        <div class="flow-step"><div class="step-no">2</div><div><div class="step-title">Intake Validation</div><div class="step-desc" id="stepValidation">Not checked</div></div></div>
+        <div class="flow-step"><div class="step-no">3</div><div><div class="step-title">Audit Job</div><div class="step-desc" id="stepJob">Not created</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Audit Requests</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Chain</th><th>Priority</th><th>Status</th><th>APP2 Job</th><th>Created</th></tr></thead>
+        <tbody id="auditRows"><tr><td colspan="6">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Audit Jobs</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Audit ID</th><th>Priority</th><th>Status</th><th>Transfer</th><th>Created</th></tr></thead>
+        <tbody id="jobRows"><tr><td colspan="6">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+`);
+
+function shortId(value) {
+  return value ? String(value).slice(0, 8) + "..." : "-";
+}
+
+function badgeFor(status) {
+  const value = String(status || "UNKNOWN").toUpperCase();
+  const cls = value.includes("FAILED") ? "red" : value.includes("QUEUED") || value.includes("READY") || value.includes("CREATED") ? "gold" : "green";
+  return `<span class="badge ${cls}">${value}</span>`;
+}
+
+async function api(path, options) {
+  const res = await fetch(API_BASE + path, {
+    headers: { "Content-Type": "application/json" },
+    ...(options || {})
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message || "Request failed");
+  return json.data;
+}
+
+async function loadAuditData() {
+  try {
+    const [audits, jobs, payments] = await Promise.all([
+      api("/api/v1/audits"),
+      api("/api/v1/audit-jobs"),
+      api("/api/v1/payments/history")
+    ]);
+
+    currentAuditId = audits[0]?.id || currentAuditId;
+    document.getElementById("auditTotal").textContent = audits.length;
+    document.getElementById("jobTotal").textContent = jobs.length;
+    document.getElementById("queuedTotal").textContent = audits.filter((item) => String(item.status).toUpperCase() === "QUEUED").length;
+    document.getElementById("paymentTotal").textContent = payments.length;
+
+    document.getElementById("auditRows").innerHTML = audits.length ? audits.map((item) => `
+      <tr>
+        <td class="hash">${shortId(item.id)}</td>
+        <td>${item.blockchain}</td>
+        <td>${item.priority}</td>
+        <td>${badgeFor(item.status)}</td>
+        <td class="hash">${shortId(item.app2_job_id)}</td>
+        <td>${String(item.created_at || "").replace("T", " ").slice(0, 19)}</td>
+      </tr>
+    `).join("") : `<tr><td colspan="6">No audit request yet.</td></tr>`;
+
+    document.getElementById("jobRows").innerHTML = jobs.length ? jobs.map((item) => `
+      <tr>
+        <td class="hash">${shortId(item.id)}</td>
+        <td class="hash">${shortId(item.audit_id)}</td>
+        <td>${item.priority}</td>
+        <td>${badgeFor(item.status)}</td>
+        <td>${badgeFor(item.app2_transfer_status)}</td>
+        <td>${String(item.created_at || "").replace("T", " ").slice(0, 19)}</td>
+      </tr>
+    `).join("") : `<tr><td colspan="6">No audit job yet.</td></tr>`;
+
+    const latestAudit = audits[0];
+    const latestJob = jobs[0];
+    document.getElementById("stepAudit").textContent = latestAudit ? `${latestAudit.status} / ${latestAudit.blockchain} / ${latestAudit.priority}` : "Waiting for audit request";
+    document.getElementById("stepValidation").textContent = latestAudit?.validation_json ? "Validation complete" : "Waiting for validation";
+    document.getElementById("stepJob").textContent = latestJob ? `${latestJob.status} / ${latestJob.app2_transfer_status}` : "Waiting for job creation";
+    document.getElementById("formStatus").textContent = "Audit intake loaded from APP1 core backend.";
+  } catch (err) {
+    document.getElementById("formStatus").textContent = err.message;
+  }
+}
+
+async function createAudit() {
+  try {
+    const data = await api("/api/v1/audits", {
+      method: "POST",
+      body: JSON.stringify({
+        blockchain: document.getElementById("blockchain").value || "POLYGON",
+        priority: document.getElementById("priority").value || "HIGH",
+        audit_type: document.getElementById("auditType").value || "FULL",
+        notes: document.getElementById("notes").value || "Audit intake request",
+        contract_ids: []
+      })
+    });
+    currentAuditId = data.id;
+    document.getElementById("formStatus").textContent = "Audit request created: " + data.id;
+    await loadAuditData();
+  } catch (err) {
+    document.getElementById("formStatus").textContent = err.message;
+  }
+}
+
+async function validateLatestAudit() {
+  try {
+    if (!currentAuditId) await loadAuditData();
+    if (!currentAuditId) throw new Error("No audit request available.");
+    await api(`/api/v1/audits/${currentAuditId}/validate`, { method: "POST", body: "{}" });
+    document.getElementById("formStatus").textContent = "Intake validation completed.";
+    await loadAuditData();
+  } catch (err) {
+    document.getElementById("formStatus").textContent = err.message;
+  }
+}
+
+async function createAuditJob() {
+  try {
+    if (!currentAuditId) await loadAuditData();
+    if (!currentAuditId) throw new Error("No audit request available.");
+    const data = await api("/api/v1/audit-jobs", {
+      method: "POST",
+      body: JSON.stringify({ audit_id: currentAuditId, priority: "HIGH" })
+    });
+    document.getElementById("formStatus").textContent = "Audit job created: " + data.id;
+    await loadAuditData();
+  } catch (err) {
+    document.getElementById("formStatus").textContent = err.message;
+  }
+}
+
+async function createPayment() {
+  try {
+    if (!currentAuditId) await loadAuditData();
+    if (!currentAuditId) throw new Error("No audit request available.");
+    await api("/api/v1/payments/create", {
+      method: "POST",
+      body: JSON.stringify({
+        audit_id: currentAuditId,
+        amount_idr: 2500000,
+        provider: "midtrans-sandbox-mock"
+      })
+    });
+    document.getElementById("formStatus").textContent = "Payment mock created.";
+    await loadAuditData();
+  } catch (err) {
+    document.getElementById("formStatus").textContent = err.message;
+  }
+}
+
+loadAuditData();
+</script>
+</body>
+</html>

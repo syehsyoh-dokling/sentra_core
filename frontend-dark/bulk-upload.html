@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bulk Upload Test</title>
+  <link rel="stylesheet" href="assets/global.css" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+</head>
+<body>
+<script src="assets/app.js?v=bulk-upload-20260518"></script>
+<script>
+const API_BASE = "http://127.0.0.1:4000";
+let selectedFiles = [];
+let running = false;
+let results = [];
+
+appShell("bulk", "Bulk Upload Test", `
+  <div class="hero">
+    <span class="badge">APP1 Load Tool</span>
+    <h1 style="margin-top:14px">Bulk Upload & Queue Injection</h1>
+    <p>
+      Tool ini membaca sampai 100 file dari folder lokal, membuat audit intake di APP1,
+      membuat audit job gateway, lalu mengirim payload ke Redis queue lewat endpoint
+      <span class="hash">POST /jobs</span> agar core worker bisa diuji.
+    </p>
+    <div class="actions">
+      <label class="btn gold">
+        Select Folder
+        <input id="folderInput" type="file" webkitdirectory directory multiple style="display:none" />
+      </label>
+      <button class="btn" onclick="generateSyntheticBatch()">Generate 100 Demo Items</button>
+      <button class="btn gold" onclick="runBulkUpload()">Run Bulk Test</button>
+      <button class="btn secondary" onclick="loadWorkerJobs()">Refresh Worker Jobs</button>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Selected</div><div class="stat-value" id="selectedCount">0</div><div class="stat-sub">max 100 files/items</div></div>
+    <div class="stat-card"><div class="stat-label">Success</div><div class="stat-value" id="successCount">0</div><div class="stat-sub">audit + queue accepted</div></div>
+    <div class="stat-card"><div class="stat-label">Failed</div><div class="stat-value" id="failedCount">0</div><div class="stat-sub">request errors</div></div>
+    <div class="stat-card"><div class="stat-label">Worker Jobs</div><div class="stat-value" id="workerJobCount">0</div><div class="stat-sub">APP1 jobs table</div></div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Bulk Command</div>
+      <div class="triple-grid" style="grid-template-columns:1fr 1fr 1fr">
+        <label class="card-desc">Limit<br><input class="input" id="limitInput" value="100" /></label>
+        <label class="card-desc">Concurrency<br><input class="input" id="concurrencyInput" value="20" /></label>
+        <label class="card-desc">Chain<br><input class="input" id="chainInput" value="POLYGON" /></label>
+      </div>
+      <label class="card-desc">Batch Label<br><input class="input" id="batchLabel" value="bulk-intake-test" /></label>
+      <p class="card-desc" id="runStatus" style="margin-top:12px">Pilih folder source contract atau generate demo items.</p>
+      <div class="progress" style="margin-top:14px"><div id="progressBar" style="width:0%"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Execution Path</div>
+      <div class="flow">
+        <div class="flow-step"><div class="step-no">1</div><div><div class="step-title">Read Folder</div><div class="step-desc">Browser membaca file lokal via folder picker.</div></div></div>
+        <div class="flow-step"><div class="step-no">2</div><div><div class="step-title">APP1 Audit Intake</div><div class="step-desc">POST /api/v1/audits + validate + audit-jobs.</div></div></div>
+        <div class="flow-step"><div class="step-no">3</div><div><div class="step-title">Redis Worker Queue</div><div class="step-desc">POST /jobs push payload ke queue:core_jobs.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Run Results</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>File</th><th>Audit</th><th>Gateway Job</th><th>Worker Job</th><th>Status</th></tr></thead>
+        <tbody id="resultRows"><tr><td colspan="6">No run yet.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Recent Worker Jobs</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Type</th><th>Status</th><th>Progress</th><th>Result</th></tr></thead>
+        <tbody id="workerRows"><tr><td colspan="5">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+`);
+
+document.getElementById("folderInput").addEventListener("change", (event) => {
+  selectedFiles = Array.from(event.target.files || [])
+    .filter((file) => file.size > 0)
+    .slice(0, 100);
+  results = [];
+  updateStats();
+  document.getElementById("runStatus").textContent = `${selectedFiles.length} files selected from folder.`;
+});
+
+function shortId(value) {
+  return value ? String(value).slice(0, 8) + "..." : "-";
+}
+
+function badge(status) {
+  const value = String(status || "UNKNOWN").toUpperCase();
+  const cls = value.includes("FAIL") || value.includes("ERROR") ? "red" : value.includes("COMPLETE") || value.includes("OK") ? "green" : "gold";
+  return `<span class="badge ${cls}">${value}</span>`;
+}
+
+async function api(path, options) {
+  const response = await fetch(API_BASE + path, {
+    headers: { "Content-Type": "application/json" },
+    ...(options || {})
+  });
+  const json = await response.json();
+  if (!json.success) throw new Error(json.message || `HTTP ${response.status}`);
+  return json.data;
+}
+
+async function readItem(file, index) {
+  if (file.synthetic) return file;
+
+  const text = await file.text();
+  return {
+    name: file.webkitRelativePath || file.name || `contract-${index + 1}.sol`,
+    content: text.slice(0, 120000),
+    size: file.size,
+    synthetic: false
+  };
+}
+
+function generateSyntheticBatch() {
+  selectedFiles = Array.from({ length: 100 }, (_, index) => ({
+    synthetic: true,
+    name: `DemoContract${String(index + 1).padStart(3, "0")}.sol`,
+    size: 512,
+    content: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract DemoContract${index + 1} {
+  mapping(address => uint256) public balances;
+  function deposit() external payable { balances[msg.sender] += msg.value; }
+  function withdraw() external {
+    uint256 amount = balances[msg.sender];
+    (bool ok,) = msg.sender.call{value: amount}("");
+    require(ok, "transfer failed");
+    balances[msg.sender] = 0;
+  }
+}`
+  }));
+  results = [];
+  updateStats();
+  document.getElementById("runStatus").textContent = "100 demo source items generated.";
+}
+
+function updateStats() {
+  document.getElementById("selectedCount").textContent = selectedFiles.length;
+  document.getElementById("successCount").textContent = results.filter((item) => item.ok).length;
+  document.getElementById("failedCount").textContent = results.filter((item) => !item.ok).length;
+  const total = Math.max(1, selectedFiles.length);
+  document.getElementById("progressBar").style.width = `${Math.round((results.length / total) * 100)}%`;
+}
+
+function renderResults() {
+  const rows = results.slice(-100).map((item, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${item.file}</td>
+      <td class="hash">${shortId(item.auditId)}</td>
+      <td class="hash">${shortId(item.auditJobId)}</td>
+      <td class="hash">${shortId(item.workerJobId)}</td>
+      <td>${badge(item.ok ? "OK" : "FAILED")}</td>
+    </tr>
+  `).join("");
+
+  document.getElementById("resultRows").innerHTML = rows || `<tr><td colspan="6">No run yet.</td></tr>`;
+}
+
+async function processOne(file, index) {
+  const item = await readItem(file, index);
+  const chain = document.getElementById("chainInput").value || "POLYGON";
+  const batchLabel = document.getElementById("batchLabel").value || "bulk-intake-test";
+
+  const audit = await api("/api/v1/audits", {
+    method: "POST",
+    body: JSON.stringify({
+      blockchain: chain,
+      priority: index % 5 === 0 ? "HIGH" : "NORMAL",
+      audit_type: "FULL",
+      notes: `${batchLabel}: ${item.name}`,
+      contract_ids: []
+    })
+  });
+
+  await api(`/api/v1/audits/${audit.id}/validate`, { method: "POST", body: "{}" });
+
+  const auditJob = await api("/api/v1/audit-jobs", {
+    method: "POST",
+    body: JSON.stringify({
+      audit_id: audit.id,
+      priority: index % 5 === 0 ? "HIGH" : "NORMAL"
+    })
+  });
+
+  const workerJob = await api("/jobs", {
+    method: "POST",
+    body: JSON.stringify({
+      job_type: "bulk_contract_upload_audit",
+      payload_json: {
+        source: "bulk-upload-ui",
+        batch: batchLabel,
+        audit_id: audit.id,
+        audit_job_id: auditJob.id,
+        file_name: item.name,
+        file_size: item.size,
+        blockchain: chain,
+        source_preview: item.content.slice(0, 2000)
+      }
+    })
+  });
+
+  return {
+    ok: true,
+    file: item.name,
+    auditId: audit.id,
+    auditJobId: auditJob.id,
+    workerJobId: workerJob.id
+  };
+}
+
+async function runPool(items, limit, worker) {
+  let index = 0;
+  const runners = Array.from({ length: Math.max(1, limit) }, async () => {
+    while (index < items.length && running) {
+      const currentIndex = index++;
+      try {
+        results.push(await worker(items[currentIndex], currentIndex));
+      } catch (error) {
+        const file = items[currentIndex];
+        results.push({
+          ok: false,
+          file: file.webkitRelativePath || file.name || file.name || `item-${currentIndex + 1}`,
+          auditId: "",
+          auditJobId: "",
+          workerJobId: "",
+          error: error.message
+        });
+      }
+      updateStats();
+      renderResults();
+    }
+  });
+  await Promise.all(runners);
+}
+
+async function runBulkUpload() {
+  if (running) return;
+  const limit = Math.min(100, Math.max(1, Number(document.getElementById("limitInput").value || 100)));
+  const concurrency = Math.min(100, Math.max(1, Number(document.getElementById("concurrencyInput").value || 20)));
+  const items = selectedFiles.slice(0, limit);
+
+  if (items.length === 0) {
+    document.getElementById("runStatus").textContent = "No files selected. Select a folder or generate demo items first.";
+    return;
+  }
+
+  running = true;
+  results = [];
+  updateStats();
+  renderResults();
+  document.getElementById("runStatus").textContent = `Running ${items.length} items with concurrency ${concurrency}...`;
+
+  await runPool(items, concurrency, processOne);
+
+  running = false;
+  document.getElementById("runStatus").textContent = `Done. Success ${results.filter((item) => item.ok).length}/${items.length}.`;
+  await loadWorkerJobs();
+}
+
+async function loadWorkerJobs() {
+  try {
+    const jobs = await api("/list/jobs");
+    document.getElementById("workerJobCount").textContent = jobs.length;
+    document.getElementById("workerRows").innerHTML = jobs.slice(0, 25).map((job) => `
+      <tr>
+        <td class="hash">${shortId(job.id)}</td>
+        <td>${job.job_type}</td>
+        <td>${badge(job.status)}</td>
+        <td>${job.progress ?? 0}%</td>
+        <td>${job.result_json ? "result stored" : "-"}</td>
+      </tr>
+    `).join("") || `<tr><td colspan="5">No worker jobs.</td></tr>`;
+  } catch (error) {
+    document.getElementById("workerRows").innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;
+  }
+}
+
+loadWorkerJobs();
+setInterval(loadWorkerJobs, 5000);
+</script>
+</body>
+</html>

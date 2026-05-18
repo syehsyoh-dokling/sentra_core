@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marketplace</title>
+    <link rel="stylesheet" href="assets/global.css" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+</head>
+<body>
+<script src="assets/app.js?v=logout-clean-20260518214626"></script>
+<script>
+appShell("marketplace", "Marketplace Aset", `
+  <div class="hero">
+    <span class="badge">Primary Ã‚Â· Secondary Ã‚Â· Risk Rated</span>
+    <h1 style="margin-top:14px">Marketplace Token Aset</h1>
+    <p>
+      Modul marketplace menampilkan aset yang sudah diverifikasi dan ditokenisasi. Investor dapat melihat detail aset,
+      rating risiko, dokumen ringkas, harga token, likuiditas, dan riwayat transaksi sebelum membeli.
+    </p>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Listed Assets</div><div class="stat-value">42</div><div class="stat-sub">Approved marketplace</div></div>
+    <div class="stat-card"><div class="stat-label">Primary Sales</div><div class="stat-value">Rp 8,6M</div><div class="stat-sub">Penjualan awal</div></div>
+    <div class="stat-card"><div class="stat-label">Secondary Volume</div><div class="stat-value">Rp 1,2M</div><div class="stat-sub">Simulasi market</div></div>
+    <div class="stat-card"><div class="stat-label">Avg Risk</div><div class="stat-value" style="color:var(--gold)">B+</div><div class="stat-sub">Rating portofolio</div></div>
+  </div>
+
+  <div class="triple-grid">
+    <div class="card">
+      <div class="card-title">Ruko Bandung Setiabudi</div>
+      <p class="card-desc">Properti produktif, sewa aktif, dokumen legal sedang final review.</p>
+      <div class="actions">
+        <span class="badge">Rp 10.000/token</span>
+        <span class="badge gold">Risk B+</span>
+      </div>
+      <div style="margin-top:14px" class="progress"><div style="width:72%"></div></div>
+      <div class="stat-sub">72% token sold</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Gudang Surabaya Timur</div>
+      <p class="card-desc">Aset logistik, kontrak sewa 24 bulan, appraisal completed.</p>
+      <div class="actions">
+        <span class="badge">Rp 25.000/token</span>
+        <span class="badge">Risk A-</span>
+      </div>
+      <div style="margin-top:14px" class="progress"><div style="width:91%"></div></div>
+      <div class="stat-sub">91% token sold</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Cold Storage UMKM</div>
+      <p class="card-desc">Proyek produktif berbasis pendapatan, distribusi hasil bulanan.</p>
+      <div class="actions">
+        <span class="badge">Rp 15.000/token</span>
+        <span class="badge gold">Risk B</span>
+      </div>
+      <div style="margin-top:14px" class="progress"><div style="width:46%"></div></div>
+      <div class="stat-sub">46% token sold</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Marketplace Order Book</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aset</th><th>Tipe</th><th>Harga</th><th>Likuiditas</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Ruko Bandung</td><td>Primary</td><td>Rp 10.000</td><td>High</td><td><span class="badge">Open</span></td></tr>
+          <tr><td>Gudang Surabaya</td><td>Secondary</td><td>Rp 26.200</td><td>Medium</td><td><span class="badge">Trading</span></td></tr>
+          <tr><td>Cold Storage UMKM</td><td>Primary</td><td>Rp 15.000</td><td>Low</td><td><span class="badge gold">Early Stage</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+`);
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentraCore Ã¢â‚¬â€ Dashboard</title>
+    <link rel="stylesheet" href="assets/global.css" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+</head>
+<body>
+<script src="assets/app.js?v=logout-clean-20260518214626"></script>
+<script>
+appShell("overview", "Dashboard Overview", `
+  <div class="hero">
+    <span class="badge">Smart Engine for Nusantara e-Contract Ecosystem</span>
+    <h1 style="margin-top:14px">Platform Tokenisasi Aset Nyata Berbasis Smart Contract</h1>
+    <p>
+      Dashboard ini menjadi pusat kendali untuk investor, pemilik aset, provider, admin, dan compliance viewer.
+      Fokus awalnya adalah properti produktif: aset didaftarkan, diverifikasi, ditokenisasi, masuk marketplace,
+      lalu transaksi dicatat melalui smart contract dan blockchain event.
+    </p>
+    <div class="actions">
+      <a class="btn" href="asset-registry.html">Daftarkan Aset</a>
+      <a class="btn secondary" href="marketplace.html">Lihat Marketplace</a>
+      <a class="btn gold" href="smart-contract.html">Smart Contract Layer</a>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Aset Terdaftar</div>
+      <div class="stat-value">128</div>
+      <div class="stat-sub">Properti, invoice, komoditas, UMKM</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Nilai Tokenisasi</div>
+      <div class="stat-value">Rp 42,8M</div>
+      <div class="stat-sub">Simulasi nilai aset aktif</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Investor Aktif</div>
+      <div class="stat-value">3.240</div>
+      <div class="stat-sub">KYC verified wallet</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Blockchain Sync</div>
+      <div class="stat-value" style="color:var(--accent)">99.8%</div>
+      <div class="stat-sub">Indexer healthy</div>
+    </div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">End-to-End Flow</div>
+      <div class="flow">
+        <div class="flow-step"><div class="step-no">1</div><div><div class="step-title">User onboarding & KYC</div><div class="step-desc">Investor atau pemilik aset mendaftar, verifikasi identitas, dan menghubungkan wallet.</div></div></div>
+        <div class="flow-step"><div class="step-no">2</div><div><div class="step-title">Asset registry</div><div class="step-desc">Pemilik aset mengunggah data aset, dokumen legal, foto, dan estimasi nilai.</div></div></div>
+        <div class="flow-step"><div class="step-no">3</div><div><div class="step-title">Tokenization engine</div><div class="step-desc">Aset yang disetujui dipecah menjadi token digital dengan supply, harga, dan hak ekonomi tertentu.</div></div></div>
+        <div class="flow-step"><div class="step-no">4</div><div><div class="step-title">Marketplace & escrow</div><div class="step-desc">Investor membeli token, dana dikunci, settlement berjalan, dan transaksi dicatat.</div></div></div>
+        <div class="flow-step"><div class="step-no">5</div><div><div class="step-title">Blockchain proof</div><div class="step-desc">Smart contract mencatat kepemilikan token, status transaksi, dan hash dokumen penting.</div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Role Coverage</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Role</th><th>Fungsi</th></tr></thead>
+          <tbody>
+            <tr><td>Investor</td><td>Membeli token aset dan menerima hasil ekonomi</td></tr>
+            <tr><td>Pemilik Aset</td><td>Mendaftarkan aset dan mengajukan tokenisasi</td></tr>
+            <tr><td>Provider</td><td>Mengelola verifikasi, marketplace, compliance</td></tr>
+            <tr><td>Verifikator</td><td>Memeriksa dokumen, legalitas, fisik, nilai aset</td></tr>
+            <tr><td>Escrow</td><td>Menahan dana/dokumen sampai syarat terpenuhi</td></tr>
+            <tr><td>Compliance</td><td>Melihat audit trail dan laporan kepatuhan</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+`);
+</script>
+</body>
+</html>
+
