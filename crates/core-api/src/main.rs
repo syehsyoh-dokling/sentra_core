@@ -229,9 +229,9 @@ async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
 
 
 async fn app1_external_providers_force() -> impl IntoResponse {
-    ok("APP1 external provider map", json!({
-        "app1": {
-            "name": "APP1",
+    ok("Sentra Core external provider map", json!({
+        "sentra_core": {
+            "name": "Sentra Core",
             "role": "Pre-Audit Administration & Audit Job Gateway",
             "responsibility": [
                 "auth",
@@ -241,11 +241,11 @@ async fn app1_external_providers_force() -> impl IntoResponse {
                 "audit intake",
                 "payment",
                 "audit job creation",
-                "transfer audit job to APP2"
+                "transfer audit job to SentraGuard"
             ]
         },
-        "app2": {
-            "name": "APP2",
+        "sentraguard": {
+            "name": "SentraGuard",
             "role": "Audit Processing Engine",
             "responsibility": [
                 "queue worker",
@@ -281,8 +281,8 @@ async fn app1_external_providers_force() -> impl IntoResponse {
                 "env": "META_GRAPH_BASE_URL",
                 "url": env::var("META_GRAPH_BASE_URL").unwrap_or_else(|_| "https://graph.facebook.com".to_string())
             },
-            "app2": {
-                "provider": "APP2 Processing Engine",
+            "sentraguard": {
+                "provider": "SentraGuard Processing Engine",
                 "env": "APP2_BASE_URL",
                 "url": env::var("APP2_BASE_URL").unwrap_or_else(|_| "http://host.docker.internal:8787".to_string())
             }
@@ -325,8 +325,8 @@ async fn app1_system_health_force(State(state): State<Arc<AppState>>) -> impl In
         .map(|r| r.get::<i64, _>("c"))
         .unwrap_or(0);
 
-    ok("APP1 system health", json!({
-        "service": "APP1 Pre-Audit Administration Gateway",
+    ok("Sentra Core system health", json!({
+        "service": "Sentra Core Pre-Audit Administration Gateway",
         "api": true,
         "db": db_status,
         "redis": redis_status,
@@ -334,7 +334,7 @@ async fn app1_system_health_force(State(state): State<Arc<AppState>>) -> impl In
         "audit_jobs": job_count,
         "payments": payment_count,
         "external_targets": {
-            "app2": env::var("APP2_BASE_URL").unwrap_or_else(|_| "http://host.docker.internal:8787".to_string()),
+            "sentraguard": env::var("APP2_BASE_URL").unwrap_or_else(|_| "http://host.docker.internal:8787".to_string()),
             "midtrans": env::var("MIDTRANS_BASE_URL").unwrap_or_else(|_| "https://api.sandbox.midtrans.com".to_string()),
             "sumsub": env::var("SUMSUB_BASE_URL").unwrap_or_else(|_| "https://api.sumsub.com".to_string()),
             "polygon_rpc": env::var("POLYGON_RPC_URL").unwrap_or_else(|_| "https://polygon-amoy.g.alchemy.com/v2/YOUR_API_KEY".to_string())
@@ -760,11 +760,11 @@ struct App1CreatePaymentInputV2 {
 }
 
 async fn app1_external_providers_v2() -> impl IntoResponse {
-    ok("APP1 external provider map", json!({
-        "app1_role": "Pre-Audit Administration & Audit Job Gateway",
-        "app2_role": "Audit Processing Engine",
+    ok("Sentra Core external provider map", json!({
+        "sentra_core_role": "Pre-Audit Administration & Audit Job Gateway",
+        "sentraguard_role": "Audit Processing Engine",
         "external_services": {
-            "app2": env::var("APP2_BASE_URL").unwrap_or_else(|_| "http://host.docker.internal:8787".to_string()),
+            "sentraguard": env::var("APP2_BASE_URL").unwrap_or_else(|_| "http://host.docker.internal:8787".to_string()),
             "midtrans": env::var("MIDTRANS_BASE_URL").unwrap_or_else(|_| "https://api.sandbox.midtrans.com".to_string()),
             "sumsub": env::var("SUMSUB_BASE_URL").unwrap_or_else(|_| "https://api.sumsub.com".to_string()),
             "polygon_rpc": env::var("POLYGON_RPC_URL").unwrap_or_else(|_| "https://polygon-amoy.g.alchemy.com/v2/YOUR_API_KEY".to_string()),
@@ -796,8 +796,8 @@ async fn app1_admin_system_health_v2(State(state): State<Arc<AppState>>) -> impl
         .map(|r| r.get::<i64,_>("c"))
         .unwrap_or(0);
 
-    ok("APP1 system health", json!({
-        "service": "APP1 Pre-Audit Administration Gateway",
+    ok("Sentra Core system health", json!({
+        "service": "Sentra Core Pre-Audit Administration Gateway",
         "api": true,
         "db": true,
         "redis": true,
@@ -819,12 +819,12 @@ async fn app1_external_test_v2(
         "polygon" | "alchemy" => env::var("POLYGON_RPC_URL").unwrap_or_else(|_| "https://polygon-amoy.g.alchemy.com/v2/YOUR_API_KEY".to_string()),
         "resend" => env::var("RESEND_BASE_URL").unwrap_or_else(|_| "https://api.resend.com".to_string()),
         "whatsapp" | "meta" => env::var("META_GRAPH_BASE_URL").unwrap_or_else(|_| "https://graph.facebook.com".to_string()),
-        "app2" => env::var("APP2_BASE_URL").unwrap_or_else(|_| "http://host.docker.internal:8787".to_string()),
+        "sentraguard" => env::var("APP2_BASE_URL").unwrap_or_else(|_| "http://host.docker.internal:8787".to_string()),
         _ => "https://httpbin.org/get".to_string(),
     });
 
     let test_id = Uuid::new_v4();
-    let request_json = input.body.unwrap_or_else(|| json!({ "source": "app1-external-test" }));
+    let request_json = input.body.unwrap_or_else(|| json!({ "source": "sentra-core-external-test" }));
 
     let _ = sqlx::query(
         "INSERT INTO external_api_tests (id, provider, target_url, method, request_json, status)
@@ -917,7 +917,7 @@ async fn app1_create_audit_v2(
 
             let _ = sqlx::query(
                 "INSERT INTO audit_status_logs (audit_id, status, message)
-                 VALUES ($1,'CREATED','Audit request created in APP1')"
+                 VALUES ($1,'CREATED','Audit request created in Sentra Core')"
             )
             .bind(audit_id)
             .execute(&state.db)
@@ -977,8 +977,8 @@ async fn app1_validate_audit_v2(
         "payment_valid": true,
         "kyc_valid": true,
         "format_valid": true,
-        "contract_compilable": "not_checked_in_app1",
-        "note": "APP1 validation only. Heavy compile/static analysis belongs to APP2."
+        "contract_compilable": "not_checked_in_sentra_core",
+        "note": "Sentra Core validation only. Heavy compile/static analysis belongs to SentraGuard."
     });
 
     let row = sqlx::query(
@@ -996,7 +996,7 @@ async fn app1_validate_audit_v2(
         Ok(Some(r)) => {
             let _ = sqlx::query(
                 "INSERT INTO audit_status_logs (audit_id, status, message, metadata_json)
-                 VALUES ($1,'READY_TO_TRANSFER','APP1 intake validation completed',$2)"
+                 VALUES ($1,'READY_TO_TRANSFER','Sentra Core intake validation completed',$2)"
             )
             .bind(id)
             .bind(validation)
@@ -1050,8 +1050,8 @@ async fn app1_create_audit_job_v2(
 
     let payload = json!({
         "audit_id": input.audit_id,
-        "source": "APP1",
-        "target": "APP2",
+        "source": "Sentra Core",
+        "target": "SentraGuard",
         "purpose": "audit-processing"
     });
 
@@ -1214,7 +1214,7 @@ async fn main() -> anyhow::Result<()> {
         .route("/transactions", post(create_transaction))
         .route("/jobs", post(create_job))
 
-        // APP1 API aliases
+        // Sentra Core API aliases
         .route("/api/v1/auth/register", post(register))
         .route("/api/v1/auth/login", post(login))
         .route("/api/v1/auth/me", get(auth_me))

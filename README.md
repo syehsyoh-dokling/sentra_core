@@ -1,13 +1,13 @@
 # Sentra Core
 
-APP1 core backend for Sentracore.
+Sentra Core backend for Sentracore.
 
 Responsibilities:
 - auth and user/project administration
 - audit intake and validation
 - audit job gateway
 - payment/mock payment flow
-- queue handoff to APP2 / Sentra Guard
+- queue handoff to SentraGuard
 
 ## Local Run
 

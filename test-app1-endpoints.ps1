@@ -2,10 +2,10 @@
 
 $Base = "http://127.0.0.1:4000"
 
-Write-Host "=== APP1 EXTERNAL PROVIDERS ===" -ForegroundColor Cyan
+Write-Host "=== SENTRA CORE EXTERNAL PROVIDERS ===" -ForegroundColor Cyan
 Invoke-RestMethod -Method GET -Uri "$Base/api/v1/external/providers"
 
-Write-Host "`n=== APP1 SYSTEM HEALTH ===" -ForegroundColor Cyan
+Write-Host "`n=== SENTRA CORE SYSTEM HEALTH ===" -ForegroundColor Cyan
 Invoke-RestMethod -Method GET -Uri "$Base/api/v1/admin/system-health"
 
 Write-Host "`n=== LOGIN ===" -ForegroundColor Cyan
@@ -60,7 +60,7 @@ $job = Invoke-RestMethod -Method POST -Uri "$Base/api/v1/audit-jobs" -ContentTyp
 $jobId = $job.data.id
 $job
 
-Write-Host "`n=== TRANSFER TO APP2 MOCK/EXTERNAL ===" -ForegroundColor Cyan
+Write-Host "`n=== TRANSFER TO SENTRAGUARD MOCK/EXTERNAL ===" -ForegroundColor Cyan
 Invoke-RestMethod -Method POST -Uri "$Base/internal/v1/app2/audit-jobs" -ContentType "application/json" -Body (@{
   job_id = $jobId
   audit_id = $auditId
@@ -84,7 +84,7 @@ Invoke-RestMethod -Method POST -Uri "$Base/api/v1/external/test" -ContentType "a
   method = "POST"
   url = "https://httpbin.org/post"
   body = @{
-    app = "app1"
+    app = "sentra-core"
     purpose = "external-api-connectivity-test"
   }
 } | ConvertTo-Json -Depth 10)

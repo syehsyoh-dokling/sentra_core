@@ -22,7 +22,7 @@
     <a class="nav-item" href="indexer.html">Indexer</a>
     <a class="nav-item" href="escrow.html">Escrow</a>
 
-    <div class="nav-section">APP1 Gateway</div>
+    <div class="nav-section">Sentra Core Gateway</div>
     <a class="nav-item" href="#" onclick="openApiPath('/health'); return false;">API Health</a>
     <a class="nav-item" href="#" onclick="openApiPath('/api/v1/external/providers'); return false;">External Providers</a>
     <a class="nav-item" href="#" onclick="openApiPath('/api/v1/admin/system-health'); return false;">System Health</a>
@@ -36,7 +36,7 @@
       <div>
         <div class="page-title">Admin Operations Center</div>
         <div class="topbar-meta" style="margin-top:4px">
-          <span><span class="live-dot"></span> APP1 Gateway Live</span>
+          <span><span class="live-dot"></span> Sentra Core Gateway Live</span>
           <span>Rust Axum / PostgreSQL / Redis / Nginx</span>
         </div>
       </div>
@@ -51,9 +51,9 @@
         <span class="badge">Smart Engine for Nusantara e-Contract Ecosystem</span>
         <h1>Smart Contract Admin Dashboard</h1>
         <p>
-          Dashboard ini digunakan admin untuk memantau APP1: onboarding, request audit,
+          Dashboard ini digunakan admin untuk memantau Sentra Core: onboarding, request audit,
           payment mock, validasi intake, audit job gateway, external provider testing,
-          dan kesiapan transfer pekerjaan ke APP2 processing engine.
+          dan kesiapan transfer pekerjaan ke SentraGuard processing engine.
         </p>
         <div class="admin-quick-actions" style="margin-top:18px">
           <button class="admin-action" onclick="loadSystemHealth()">Refresh System Health</button>
@@ -65,7 +65,7 @@
 
       <div class="admin-metric-row">
         <div class="stat-card">
-          <div class="stat-label">APP1 API</div>
+          <div class="stat-label">Sentra Core API</div>
           <div class="stat-value" id="apiStatus">Checking</div>
           <div class="stat-sub">Core gateway status</div>
         </div>
@@ -82,7 +82,7 @@
         <div class="stat-card">
           <div class="stat-label">Audit Intake</div>
           <div class="stat-value" id="auditCount">0</div>
-          <div class="stat-sub">APP1 request records</div>
+          <div class="stat-sub">Sentra Core request records</div>
         </div>
       </div>
 
@@ -110,7 +110,7 @@
         </div>
 
         <div class="card">
-          <div class="card-title">APP1 External Providers</div>
+      <div class="card-title">Sentra Core External Providers</div>
           <div class="admin-pill-list" id="providerList">
             <div class="admin-pill"><strong>Loading</strong><span>Fetching providers...</span></div>
           </div>
@@ -147,7 +147,7 @@
           <div class="admin-pill-list">
             <div class="admin-pill"><strong>User & Role</strong><span>Admin, developer, viewer</span></div>
             <div class="admin-pill"><strong>Audit Intake</strong><span>Request, payment, validation</span></div>
-            <div class="admin-pill"><strong>Job Gateway</strong><span>Prepare transfer to APP2</span></div>
+            <div class="admin-pill"><strong>Job Gateway</strong><span>Prepare transfer to SentraGuard</span></div>
             <div class="admin-pill"><strong>External API</strong><span>Provider test runner</span></div>
             <div class="admin-pill"><strong>System Health</strong><span>API, DB, Redis, Worker</span></div>
           </div>
@@ -205,9 +205,9 @@ async function loadSystemHealth() {
 
     document.getElementById("auditCount").textContent = auditCount;
 
-    addEvent("System health refreshed", "APP1", "OK", "api/db/redis");
+    addEvent("System health refreshed", "Sentra Core", "OK", "api/db/redis");
   } catch (err) {
-    addEvent("System health failed", "APP1", "ERR", err.message);
+    addEvent("System health failed", "Sentra Core", "ERR", err.message);
   }
 }
 
@@ -230,10 +230,10 @@ async function loadProviders() {
     }).join("");
 
     list.innerHTML = html || `<div class="admin-pill"><strong>No provider</strong><span>Empty response</span></div>`;
-    addEvent("External providers loaded", "APP1", "OK", "provider map");
+    addEvent("External providers loaded", "Sentra Core", "OK", "provider map");
   } catch (err) {
     list.innerHTML = `<div class="admin-pill"><strong>Error</strong><span>${err.message}</span></div>`;
-    addEvent("External providers failed", "APP1", "ERR", err.message);
+    addEvent("External providers failed", "Sentra Core", "ERR", err.message);
   }
 }
 
@@ -255,10 +255,10 @@ async function createDummyAudit() {
 
     if (!json.success) throw new Error(json.message || "Create audit failed");
 
-    addEvent("Dummy audit created", "APP1", "OK", json.data.id);
+    addEvent("Dummy audit created", "Sentra Core", "OK", json.data.id);
     await loadSystemHealth();
   } catch (err) {
-    addEvent("Dummy audit failed", "APP1", "ERR", err.message);
+    addEvent("Dummy audit failed", "Sentra Core", "ERR", err.message);
   }
 }
 

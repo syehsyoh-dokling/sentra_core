@@ -17,10 +17,10 @@ let results = [];
 
 appShell("bulk", "Bulk Upload Test", `
   <div class="hero">
-    <span class="badge">APP1 Load Tool</span>
+    <span class="badge">Sentra Core Load Tool</span>
     <h1 style="margin-top:14px">Bulk Upload & Queue Injection</h1>
     <p>
-      Tool ini membaca sampai 100 file dari folder lokal, membuat audit intake di APP1,
+      Tool ini membaca sampai 100 file dari folder lokal, membuat audit intake di Sentra Core,
       membuat audit job gateway, lalu mengirim payload ke Redis queue lewat endpoint
       <span class="hash">POST /jobs</span> agar core worker bisa diuji.
     </p>
@@ -39,7 +39,7 @@ appShell("bulk", "Bulk Upload Test", `
     <div class="stat-card"><div class="stat-label">Selected</div><div class="stat-value" id="selectedCount">0</div><div class="stat-sub">max 100 files/items</div></div>
     <div class="stat-card"><div class="stat-label">Success</div><div class="stat-value" id="successCount">0</div><div class="stat-sub">audit + queue accepted</div></div>
     <div class="stat-card"><div class="stat-label">Failed</div><div class="stat-value" id="failedCount">0</div><div class="stat-sub">request errors</div></div>
-    <div class="stat-card"><div class="stat-label">Worker Jobs</div><div class="stat-value" id="workerJobCount">0</div><div class="stat-sub">APP1 jobs table</div></div>
+    <div class="stat-card"><div class="stat-label">Worker Jobs</div><div class="stat-value" id="workerJobCount">0</div><div class="stat-sub">Sentra Core jobs table</div></div>
   </div>
 
   <div class="card-grid">
@@ -59,7 +59,7 @@ appShell("bulk", "Bulk Upload Test", `
       <div class="card-title">Execution Path</div>
       <div class="flow">
         <div class="flow-step"><div class="step-no">1</div><div><div class="step-title">Read Folder</div><div class="step-desc">Browser membaca file lokal via folder picker.</div></div></div>
-        <div class="flow-step"><div class="step-no">2</div><div><div class="step-title">APP1 Audit Intake</div><div class="step-desc">POST /api/v1/audits + validate + audit-jobs.</div></div></div>
+        <div class="flow-step"><div class="step-no">2</div><div><div class="step-title">Sentra Core Audit Intake</div><div class="step-desc">POST /api/v1/audits + validate + audit-jobs.</div></div></div>
         <div class="flow-step"><div class="step-no">3</div><div><div class="step-title">Redis Worker Queue</div><div class="step-desc">POST /jobs push payload ke queue:core_jobs.</div></div></div>
       </div>
     </div>

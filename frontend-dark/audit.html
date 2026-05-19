@@ -15,11 +15,11 @@ let currentAuditId = "";
 
 appShell("audit", "Audit Intake", `
   <div class="hero">
-    <span class="badge">APP1 Gateway</span>
+    <span class="badge">Sentra Core Gateway</span>
     <h1 style="margin-top:14px">Audit Intake</h1>
     <p>
-      Halaman ini adalah pintu masuk APP1 untuk membuat audit request, validasi intake,
-      membuat audit job, lalu menyiapkan transfer ke APP2 processing engine.
+      Halaman ini adalah pintu masuk Sentra Core untuk membuat audit request, validasi intake,
+      membuat audit job, lalu menyiapkan transfer ke SentraGuard processing engine.
     </p>
     <div class="actions">
       <button class="btn gold" onclick="createAudit()">Create Audit Request</button>
@@ -30,9 +30,9 @@ appShell("audit", "Audit Intake", `
   </div>
 
   <div class="stat-grid">
-    <div class="stat-card"><div class="stat-label">Audits</div><div class="stat-value" id="auditTotal">0</div><div class="stat-sub">from APP1 database</div></div>
+    <div class="stat-card"><div class="stat-label">Audits</div><div class="stat-value" id="auditTotal">0</div><div class="stat-sub">from Sentra Core database</div></div>
     <div class="stat-card"><div class="stat-label">Audit Jobs</div><div class="stat-value" id="jobTotal">0</div><div class="stat-sub">gateway jobs</div></div>
-    <div class="stat-card"><div class="stat-label">Queued</div><div class="stat-value" id="queuedTotal">0</div><div class="stat-sub">ready for APP2</div></div>
+    <div class="stat-card"><div class="stat-label">Queued</div><div class="stat-value" id="queuedTotal">0</div><div class="stat-sub">ready for SentraGuard</div></div>
     <div class="stat-card"><div class="stat-label">Payments</div><div class="stat-value" id="paymentTotal">0</div><div class="stat-sub">payment mock/history</div></div>
   </div>
 
@@ -53,7 +53,7 @@ appShell("audit", "Audit Intake", `
     </div>
 
     <div class="card">
-      <div class="card-title">APP1 -> APP2 Readiness</div>
+      <div class="card-title">Sentra Core to SentraGuard Readiness</div>
       <div class="flow">
         <div class="flow-step"><div class="step-no">1</div><div><div class="step-title">Audit Request</div><div class="step-desc" id="stepAudit">Waiting for data</div></div></div>
         <div class="flow-step"><div class="step-no">2</div><div><div class="step-title">Intake Validation</div><div class="step-desc" id="stepValidation">Not checked</div></div></div>
@@ -66,7 +66,7 @@ appShell("audit", "Audit Intake", `
     <div class="card-title">Audit Requests</div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>ID</th><th>Chain</th><th>Priority</th><th>Status</th><th>APP2 Job</th><th>Created</th></tr></thead>
+        <thead><tr><th>ID</th><th>Chain</th><th>Priority</th><th>Status</th><th>SentraGuard Job</th><th>Created</th></tr></thead>
         <tbody id="auditRows"><tr><td colspan="6">Loading...</td></tr></tbody>
       </table>
     </div>
@@ -144,7 +144,7 @@ async function loadAuditData() {
     document.getElementById("stepAudit").textContent = latestAudit ? `${latestAudit.status} / ${latestAudit.blockchain} / ${latestAudit.priority}` : "Waiting for audit request";
     document.getElementById("stepValidation").textContent = latestAudit?.validation_json ? "Validation complete" : "Waiting for validation";
     document.getElementById("stepJob").textContent = latestJob ? `${latestJob.status} / ${latestJob.app2_transfer_status}` : "Waiting for job creation";
-    document.getElementById("formStatus").textContent = "Audit intake loaded from APP1 core backend.";
+    document.getElementById("formStatus").textContent = "Audit intake loaded from Sentra Core backend.";
   } catch (err) {
     document.getElementById("formStatus").textContent = err.message;
   }
