@@ -304,11 +304,35 @@ async fn app1_system_health_force(State(state): State<Arc<AppState>>) -> impl In
         Err(_) => false,
     };
 
+    let audit_count = sqlx::query("SELECT COUNT(*)::BIGINT AS c FROM audits")
+        .fetch_one(&state.db)
+        .await
+        .ok()
+        .map(|r| r.get::<i64, _>("c"))
+        .unwrap_or(0);
+
+    let job_count = sqlx::query("SELECT COUNT(*)::BIGINT AS c FROM audit_jobs")
+        .fetch_one(&state.db)
+        .await
+        .ok()
+        .map(|r| r.get::<i64, _>("c"))
+        .unwrap_or(0);
+
+    let payment_count = sqlx::query("SELECT COUNT(*)::BIGINT AS c FROM payments")
+        .fetch_one(&state.db)
+        .await
+        .ok()
+        .map(|r| r.get::<i64, _>("c"))
+        .unwrap_or(0);
+
     ok("APP1 system health", json!({
         "service": "APP1 Pre-Audit Administration Gateway",
         "api": true,
         "db": db_status,
         "redis": redis_status,
+        "audits": audit_count,
+        "audit_jobs": job_count,
+        "payments": payment_count,
         "external_targets": {
             "app2": env::var("APP2_BASE_URL").unwrap_or_else(|_| "http://host.docker.internal:8787".to_string()),
             "midtrans": env::var("MIDTRANS_BASE_URL").unwrap_or_else(|_| "https://api.sandbox.midtrans.com".to_string()),

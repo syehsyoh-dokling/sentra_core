@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SentraCore Ã¢â‚¬â€ Admin Operations Center</title>
+  <title>SentraCore - Admin Operations Center</title>
   <link rel="stylesheet" href="assets/global.css" />
   <link rel="icon" type="image/png" href="assets/favicon.png" />
 </head>
@@ -16,20 +16,19 @@
     </div>
 
     <div class="nav-section">Admin</div>
-    <a class="nav-item active" href="admin-dashboard.html">Ã¢â€“Â£ Operations Center</a>
-    <a class="nav-item" href="dashboard.html">Ã¢Â¬Â¡ User Dashboard</a>
-    <a class="nav-item" href="smart-contract.html">Ã¢Â¬Â¢ Smart Contract</a>
-    <a class="nav-item" href="indexer.html">Ã¢Â¬â„¢ Indexer</a>
-    <a class="nav-item" href="escrow.html">Ã¢Å¸Â³ Escrow</a>
+    <a class="nav-item active" href="admin-dashboard.html">Operations Center</a>
+    <a class="nav-item" href="dashboard.html">User Dashboard</a>
+    <a class="nav-item" href="smart-contract.html">Smart Contract</a>
+    <a class="nav-item" href="indexer.html">Indexer</a>
+    <a class="nav-item" href="escrow.html">Escrow</a>
 
     <div class="nav-section">APP1 Gateway</div>
-    <a class="nav-item" href="http://127.0.0.1:4000/health" target="_blank">Ã¢â€”Â API Health</a>
-    <a class="nav-item" href="http://127.0.0.1:4000/api/v1/external/providers" target="_blank">Ã¢â€”â€  External Providers</a>
-    <a class="nav-item" href="http://127.0.0.1:4000/api/v1/admin/system-health" target="_blank">Ã¢â€”â€° System Health</a>
+    <a class="nav-item" href="#" onclick="openApiPath('/health'); return false;">API Health</a>
+    <a class="nav-item" href="#" onclick="openApiPath('/api/v1/external/providers'); return false;">External Providers</a>
+    <a class="nav-item" href="#" onclick="openApiPath('/api/v1/admin/system-health'); return false;">System Health</a>
 
     <div class="nav-section">Session</div>
-    <a class="nav-item" href="#" onclick="logoutAdmin()">Ã¢ÂÂ» Logout</a>
-      <a class="nav-item logout" href="#" onclick="sentraFullLogout(); return false;">â» Logout</a>
+    <a class="nav-item logout" href="#" onclick="sentraFullLogout(); return false;">Logout</a>
 </aside>
 
   <main class="main">
@@ -38,7 +37,7 @@
         <div class="page-title">Admin Operations Center</div>
         <div class="topbar-meta" style="margin-top:4px">
           <span><span class="live-dot"></span> APP1 Gateway Live</span>
-          <span>Rust Axum Ã‚Â· PostgreSQL Ã‚Â· Redis Ã‚Â· Nginx</span>
+          <span>Rust Axum / PostgreSQL / Redis / Nginx</span>
         </div>
       </div>
       <div class="topbar-meta">
@@ -60,7 +59,7 @@
           <button class="admin-action" onclick="loadSystemHealth()">Refresh System Health</button>
           <button class="admin-action" onclick="loadProviders()">Check External Providers</button>
           <button class="admin-action" onclick="createDummyAudit()">Create Dummy Audit</button>
-          <button class="admin-action" onclick="openLink('http://127.0.0.1:4000/health')">Open API Health</button>
+          <button class="admin-action" onclick="openApiPath('/health')">Open API Health</button>
         </div>
       </div>
 
@@ -159,7 +158,9 @@
 </div>
 
 <script>
-const API_BASE = "http://127.0.0.1:4000";
+const API_BASE = window.location.hostname === "sentracore.danandad.com"
+  ? "https://api-sentracore.danandad.com"
+  : "http://127.0.0.1:4000";
 
 function getToken() {
   return localStorage.getItem("sentra_token") || sessionStorage.getItem("sentra_token");
@@ -181,6 +182,10 @@ function openLink(url) {
   window.open(url, "_blank");
 }
 
+function openApiPath(path) {
+  window.open(API_BASE + path, "_blank");
+}
+
 async function loadSystemHealth() {
   try {
     const res = await fetch(API_BASE + "/api/v1/admin/system-health");
@@ -191,7 +196,14 @@ async function loadSystemHealth() {
     document.getElementById("apiStatus").textContent = json.data.api ? "Live" : "Down";
     document.getElementById("dbStatus").textContent = json.data.db ? "OK" : "Down";
     document.getElementById("redisStatus").textContent = json.data.redis ? "OK" : "Down";
-    document.getElementById("auditCount").textContent = json.data.audits ?? "0";
+    let auditCount = json.data.audits;
+    if (auditCount === undefined || auditCount === null) {
+      const auditRes = await fetch(API_BASE + "/api/v1/audits");
+      const auditJson = await auditRes.json();
+      auditCount = Array.isArray(auditJson.data) ? auditJson.data.length : 0;
+    }
+
+    document.getElementById("auditCount").textContent = auditCount;
 
     addEvent("System health refreshed", "APP1", "OK", "api/db/redis");
   } catch (err) {
