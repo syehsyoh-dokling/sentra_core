@@ -759,6 +759,15 @@ struct App1CreatePaymentInputV2 {
     provider: Option<String>,
 }
 
+#[derive(Deserialize)]
+struct SentraGuardJobStatusInput {
+    core_job_id: Uuid,
+    sentraguard_job_id: Option<String>,
+    status: String,
+    transfer_status: Option<String>,
+    response: Option<Value>,
+}
+
 async fn app1_external_providers_v2() -> impl IntoResponse {
     ok("Sentra Core external provider map", json!({
         "sentra_core_role": "Pre-Audit Administration & Audit Job Gateway",
@@ -1172,6 +1181,76 @@ async fn run_migrations(pool: &PgPool) -> anyhow::Result<()> {
     Ok(())
 }
 
+async fn sentraguard_job_status_webhook(
+    State(state): State<Arc<AppState>>,
+    Json(input): Json<SentraGuardJobStatusInput>,
+) -> impl IntoResponse {
+    let normalized_status = input.status.trim().to_uppercase();
+    let transfer_status = input
+        .transfer_status
+        .unwrap_or_else(|| "TRANSFERRED".to_string());
+    let response = input.response.unwrap_or_else(|| json!({}));
+    let audit_status = match normalized_status.as_str() {
+        "PROCESSING" => "PROCESSING",
+        "COMPLETED" => "COMPLETED",
+        "FAILED" => "FAILED",
+        "QUEUED" | "CREATED" | "TRANSFERRED" => "QUEUED",
+        _ => "QUEUED",
+    };
+
+    let row = sqlx::query(
+        "UPDATE audit_jobs
+         SET status=$2, app2_transfer_status=$3, app2_response_json=$4, updated_at=NOW()
+         WHERE id=$1
+         RETURNING id, audit_id, status, app2_transfer_status"
+    )
+    .bind(input.core_job_id)
+    .bind(&normalized_status)
+    .bind(&transfer_status)
+    .bind(json!({
+        "sentraguard_job_id": input.sentraguard_job_id,
+        "status": normalized_status,
+        "transfer_status": transfer_status,
+        "response": response
+    }))
+    .fetch_optional(&state.db)
+    .await;
+
+    match row {
+        Ok(Some(r)) => {
+            let audit_id: Uuid = r.get("audit_id");
+            let _ = sqlx::query("UPDATE audits SET status=$2, updated_at=NOW() WHERE id=$1")
+                .bind(audit_id)
+                .bind(audit_status)
+                .execute(&state.db)
+                .await;
+            let _ = sqlx::query(
+                "INSERT INTO audit_status_logs (audit_id, status, message, metadata_json)
+                 VALUES ($1,$2,$3,$4)"
+            )
+            .bind(audit_id)
+            .bind(audit_status)
+            .bind(format!("SentraGuard job status: {}", normalized_status))
+            .bind(json!({
+                "core_job_id": input.core_job_id,
+                "sentraguard_job_id": input.sentraguard_job_id,
+                "transfer_status": transfer_status
+            }))
+            .execute(&state.db)
+            .await;
+
+            ok("SentraGuard job status updated", json!({
+                "id": r.get::<Uuid,_>("id"),
+                "audit_id": audit_id,
+                "status": r.get::<String,_>("status"),
+                "transfer_status": r.get::<String,_>("app2_transfer_status")
+            })).into_response()
+        }
+        Ok(None) => err(StatusCode::NOT_FOUND, "Core audit job not found").into_response(),
+        Err(e) => err(StatusCode::INTERNAL_SERVER_ERROR, &format!("Failed to update SentraGuard status: {}", e)).into_response(),
+    }
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv().ok();
@@ -1227,6 +1306,8 @@ async fn main() -> anyhow::Result<()> {
         .route("/api/v1/audit-jobs", post(app1_create_audit_job_v2).get(app1_list_audit_jobs_v2))
         .route("/api/v1/payments/create", post(app1_payment_create_v2))
         .route("/api/v1/payments/history", get(app1_payment_history_v2))
+        .route("/webhooks/sentraguard/job-status", post(sentraguard_job_status_webhook))
+        .route("/webhooks/app2/job-status", post(sentraguard_job_status_webhook))
         .route("/api/v1/admin/system-health", get(app1_system_health_force))
         .route("/api/v1/external/providers", get(app1_external_providers_force))
         .route("/api/v1/external/test", post(app1_external_test_v2))
