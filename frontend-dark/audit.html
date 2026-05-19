@@ -12,7 +12,9 @@
 <script>
 const API_BASE = (() => {
   if (location.hostname === "sentracore.danandad.com") return "https://api-sentracore.danandad.com";
-  return localStorage.getItem("sentracore_api_base") || "http://127.0.0.1:4000";
+  if (location.protocol === "file:") return localStorage.getItem("sentracore_api_base") || "https://api-sentracore.danandad.com";
+  if (["127.0.0.1", "localhost"].includes(location.hostname)) return localStorage.getItem("sentracore_api_base") || "http://127.0.0.1:4000";
+  return localStorage.getItem("sentracore_api_base") || "https://api-sentracore.danandad.com";
 })();
 let currentAuditId = "";
 
@@ -165,6 +167,8 @@ async function loadAuditData() {
     document.getElementById("formStatus").textContent = "Audit intake loaded from Sentra Core backend.";
   } catch (err) {
     document.getElementById("formStatus").textContent = err.message;
+    document.getElementById("auditRows").innerHTML = `<tr><td colspan="6">${err.message}</td></tr>`;
+    document.getElementById("jobRows").innerHTML = `<tr><td colspan="6">${err.message}</td></tr>`;
   }
 }
 
