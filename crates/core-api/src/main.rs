@@ -1097,7 +1097,7 @@ async fn app1_create_audit_job_v2(
 }
 
 async fn app1_list_audit_jobs_v2(State(state): State<Arc<AppState>>) -> impl IntoResponse {
-    let rows = sqlx::query("SELECT to_jsonb(t) AS item FROM (SELECT * FROM audit_jobs ORDER BY created_at DESC LIMIT 50) t")
+    let rows = sqlx::query("SELECT to_jsonb(t) AS item FROM (SELECT * FROM audit_jobs ORDER BY created_at DESC LIMIT 200) t")
         .fetch_all(&state.db)
         .await;
 
