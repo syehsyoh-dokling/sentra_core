@@ -47,18 +47,18 @@
       <div class="login-card">
         <h2>Login Workspace</h2>
         <div class="sub">
-          Gunakan akun yang sudah dibuat di backend lokal. Token akan disimpan di browser untuk akses dashboard.
+          Gunakan akun yang sudah terdaftar. Token akses akan disimpan di browser untuk membuka dashboard.
         </div>
 
         <form id="loginForm">
           <div class="form-group">
             <label>Email</label>
-            <input class="input" id="email" type="email" value="saifuddin@example.com" autocomplete="email" required />
+            <input class="input" id="email" type="email" autocomplete="email" required />
           </div>
 
           <div class="form-group">
             <label>Password</label>
-            <input class="input" id="password" type="password" value="password123" autocomplete="current-password" required />
+            <input class="input" id="password" type="password" autocomplete="current-password" required />
           </div>
 
           <div class="row">
@@ -67,26 +67,20 @@
           </div>
 
           <button class="btn" type="submit">Masuk ke Dashboard</button>
-          <button class="btn secondary" type="button" id="demoBtn">Gunakan Akun Demo</button>
-
           <div class="status" id="statusText"></div>
         </form>
-
-        <div class="demo-box">
-          Demo lokal:<br />
-          Email: <code>saifuddin@example.com</code><br />
-          Password: <code>password123</code><br />
-          API: <code>http://127.0.0.1:4000</code>
-        </div>
       </div>
     </section>
   </main>
 
 <script>
-const API_BASE = "http://127.0.0.1:4000";
+const API_BASE = (() => {
+  const host = window.location.hostname;
+  if (host === "sentracore.danandad.com") return "https://api-sentracore.danandad.com";
+  return "http://127.0.0.1:4000";
+})();
 
 const form = document.getElementById("loginForm");
-const demoBtn = document.getElementById("demoBtn");
 const statusText = document.getElementById("statusText");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
@@ -130,17 +124,6 @@ async function login(email, password) {
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  try {
-    await login(emailInput.value.trim(), passwordInput.value);
-  } catch (err) {
-    setStatus(err.message, "err");
-  }
-});
-
-demoBtn.addEventListener("click", async () => {
-  emailInput.value = "saifuddin@example.com";
-  passwordInput.value = "password123";
 
   try {
     await login(emailInput.value.trim(), passwordInput.value);
